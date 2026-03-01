@@ -42,7 +42,7 @@ SecOps Academy is a modern web application designed to provide training for secu
 ### Training Modules
 <img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/training-modules.jpg" alt="Training Modules" width="800"/>
 
-*Comprehensive curriculum from beginner to advanced malware analysis techniques*
+*Curriculum from beginner to advanced malware analysis techniques*
 
 </div>
 
