@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ SecOps Academy
+# SecOps Academy
 
 **Next-Generation Security Operations Training Platform**
 
@@ -12,45 +12,47 @@
 
 *Empowering security professionals with hands-on training and interactive learning experiences*
 
-[Features](#-features) • [Screenshots](#-screenshots) • [Tech Stack](#-tech-stack) • [Quick Start](#-quick-start)
+[Features](#features) • [Screenshots](#screenshots) • [Tech Stack](#tech-stack) • [Quick Start](#quick-start)
 
 </div>
 
 ---
 
-## 🌟 Overview
+## Overview
 
 SecOps Academy is a modern, full-stack web application designed to provide comprehensive training for security operations professionals. Built with cutting-edge technologies, it offers an interactive learning environment for mastering security concepts, tools, and best practices.
 
-### ✨ Features
+### Features
 
-- 🎯 **Interactive Learning Modules** - Hands-on labs and exercises
-- 🔐 **Secure Authentication** - Passport.js-powered user management
-- ⚡ **Real-time Updates** - WebSocket integration for live interactions
-- 🎨 **Modern UI/UX** - Beautiful interface with TailwindCSS and Radix UI
-- 📊 **Progress Tracking** - Monitor learning journey with detailed analytics
-- 🌙 **Dark Mode Support** - Comfortable learning in any environment
-- 📱 **Responsive Design** - Seamless experience across all devices
+- **Interactive Learning Modules** - Hands-on labs and exercises
+- **Secure Authentication** - Passport.js-powered user management
+- **Real-time Updates** - WebSocket integration for live interactions
+- **Modern UI/UX** - Beautiful interface with TailwindCSS and Radix UI
+- **Progress Tracking** - Monitor learning journey with detailed analytics
+- **Dark Mode Support** - Comfortable learning in any environment
+- **Responsive Design** - Seamless experience across all devices
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 <div align="center">
 
 ### Dashboard Overview
-![Dashboard](.github/screenshots/dashboard.jpg)
+<img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/dashboard.jpg" alt="Dashboard" width="800"/>
+
 *Track your progress with real-time statistics and quick access to training modules*
 
 ### Training Modules
-![Training Modules](.github/screenshots/training-modules.jpg)
+<img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/training-modules.jpg" alt="Training Modules" width="800"/>
+
 *Comprehensive curriculum from beginner to advanced malware analysis techniques*
 
 </div>
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 <div align="center">
 
@@ -68,7 +70,7 @@ SecOps Academy is a modern, full-stack web application designed to provide compr
 
 </div>
 
-### 🔧 Core Technologies
+### Core Technologies
 
 - **Frontend Framework**: React 18 with TypeScript
 - **Build Tool**: Vite 7 for lightning-fast development
@@ -86,7 +88,7 @@ SecOps Academy is a modern, full-stack web application designed to provide compr
 
 ---
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -97,22 +99,22 @@ Before you begin, ensure you have the following installed:
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
-### 1️⃣ Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/TrailByte/secops_academy.git
 cd secops_academy
 ```
 
-### 2️⃣ Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3️⃣ Environment Configuration
+### 3. Environment Configuration
 
 Create a `.env` file in the root directory:
 
@@ -131,24 +133,24 @@ PORT=3000
 WS_PORT=3001
 ```
 
-### 4️⃣ Database Setup
+### 4. Database Setup
 
 ```bash
 # Push database schema
 npm run db:push
 ```
 
-### 5️⃣ Start Development Server
+### 5. Start Development Server
 
 ```bash
 npm run dev
 ```
 
-🎉 **Success!** Open [http://localhost:3000](http://localhost:3000) in your browser.
+**Success!** Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📦 Available Scripts
+## Available Scripts
 
 | Command | Description |
 |---------|-------------|
@@ -160,41 +162,41 @@ npm run dev
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 secops_academy/
-├── 📂 client/          # React frontend application
+├── client/          # React frontend application
 │   ├── src/
 │   ├── components/
 │   └── ...
-├── 📂 server/          # Express backend server
+├── server/          # Express backend server
 │   ├── routes/
 │   ├── middleware/
 │   └── index.ts
-├── 📂 shared/          # Shared types and utilities
+├── shared/          # Shared types and utilities
 │   ├── types/
 │   └── utils/
-├── 📂 script/          # Build and utility scripts
-├── 📄 drizzle.config.ts    # Database ORM configuration
-├── 📄 vite.config.ts       # Vite build configuration
-├── 📄 tailwind.config.ts   # TailwindCSS configuration
-└── 📄 package.json         # Project dependencies
+├── script/          # Build and utility scripts
+├── drizzle.config.ts    # Database ORM configuration
+├── vite.config.ts       # Vite build configuration
+├── tailwind.config.ts   # TailwindCSS configuration
+└── package.json         # Project dependencies
 ```
 
 ---
 
-## 🔒 Security Features
+## Security Features
 
-- 🔐 **Secure Authentication** - Password hashing with industry-standard algorithms
-- 🛡️ **Session Management** - PostgreSQL-backed sessions for enhanced security
-- 🚫 **CSRF Protection** - Built-in protection against cross-site attacks
-- ✅ **Input Validation** - Zod schema validation on all user inputs
-- 🔑 **Environment Variables** - Sensitive data stored securely
+- **Secure Authentication** - Password hashing with industry-standard algorithms
+- **Session Management** - PostgreSQL-backed sessions for enhanced security
+- **CSRF Protection** - Built-in protection against cross-site attacks
+- **Input Validation** - Zod schema validation on all user inputs
+- **Environment Variables** - Sensitive data stored securely
 
 ---
 
-## 🎨 UI Components
+## UI Components
 
 Built with **Radix UI** primitives for maximum accessibility:
 
@@ -208,15 +210,15 @@ All styled with **TailwindCSS** and customizable through theme configuration.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from the community! Here's how you can help:
 
-1. 🍴 Fork the repository
-2. 🌿 Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. 💾 Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. 📤 Push to the branch (`git push origin feature/AmazingFeature`)
-5. 🔃 Open a Pull Request
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ### Development Guidelines
 
@@ -228,15 +230,15 @@ We welcome contributions from the community! Here's how you can help:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- Built with ❤️ by the TrailByte team
+- Built with care by the TrailByte team
 - Powered by amazing open-source projects
 - Special thanks to all contributors
 
@@ -244,12 +246,12 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 <div align="center">
 
-### 💡 Questions or Issues?
+### Questions or Issues?
 
 [Open an Issue](https://github.com/TrailByte/secops_academy/issues) • [Discussions](https://github.com/TrailByte/secops_academy/discussions)
 
-**Made with ☕ and 🛡️ by security professionals, for security professionals**
+**Made by security professionals, for security professionals**
 
-⭐ **Star this repo if you find it useful!** ⭐
+**Star this repo if you find it useful!**
 
 </div>
