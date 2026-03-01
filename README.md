@@ -20,7 +20,7 @@
 
 ## Overview
 
-SecOps Academy is a modern web application designed to provide training for security professionals. It offers an interactive learning environment for mastering security concepts, tools, and best practices. For now it support basic Malware Analysis concepts.
+SecOps Academy is a modern web application designed to provide training for security professionals. It offers an interactive learning environment for mastering security concepts, tools, and best practices. For now, it supports basic Malware Analysis concepts.
 
 ### Features
 
