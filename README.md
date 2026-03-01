@@ -162,13 +162,6 @@ secops_academy/
 
 This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
 
-Key points of GPLv3:
-- You may use, modify, and distribute this software
-- Any derivative works must also be licensed under GPLv3
-- Source code must be made available when distributing
-- Changes must be documented
-- No warranty is provided
-
 ---
 
 <div align="center">
