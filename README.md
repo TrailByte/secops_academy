@@ -12,7 +12,7 @@
 
 *Empowering security professionals with hands-on training and interactive learning experiences*
 
-[Features](#-features) • [Tech Stack](#-tech-stack) • [Quick Start](#-quick-start) • [Documentation](#-documentation)
+[Features](#-features) • [Screenshots](#-screenshots) • [Tech Stack](#-tech-stack) • [Quick Start](#-quick-start)
 
 </div>
 
@@ -31,6 +31,22 @@ SecOps Academy is a modern, full-stack web application designed to provide compr
 - 📊 **Progress Tracking** - Monitor learning journey with detailed analytics
 - 🌙 **Dark Mode Support** - Comfortable learning in any environment
 - 📱 **Responsive Design** - Seamless experience across all devices
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+
+### Dashboard Overview
+![Dashboard](.github/screenshots/dashboard.jpg)
+*Track your progress with real-time statistics and quick access to training modules*
+
+### Training Modules
+![Training Modules](.github/screenshots/training-modules.jpg)
+*Comprehensive curriculum from beginner to advanced malware analysis techniques*
+
+</div>
 
 ---
 
