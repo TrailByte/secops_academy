@@ -166,8 +166,8 @@ This project is licensed under the **GNU General Public License v3.0** - see the
 
 <div align="center">
 
-### Questions or Issues?
+### Issues?
 
-[Open an Issue](https://github.com/TrailByte/secops_academy/issues) • [Discussions](https://github.com/TrailByte/secops_academy/discussions)
+[Open an Issue](https://github.com/TrailByte/secops_academy/issues)
 
 </div>
