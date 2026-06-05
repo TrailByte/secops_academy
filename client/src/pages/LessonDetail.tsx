@@ -25,7 +25,7 @@ const PATH_THEME: Record<string, { accent: string; accentDim: string; border: st
     backHref: "/learn/malware-analysis/lessons", backLabel: "Malware Analysis Modules",
   },
   "android-security": {
-    accent: "#20dcbe", accentDim: "rgba(32,220,190,0.10)", border: "rgba(32,220,190,0.20)",
+    accent: "#22c55e", accentDim: "rgba(34,197,94,0.10)", border: "rgba(34,197,94,0.20)",
     backHref: "/learn/android-security/lessons", backLabel: "Android Security Modules",
   },
 };

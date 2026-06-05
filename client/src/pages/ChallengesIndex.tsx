@@ -2,22 +2,28 @@ import Layout from "@/components/Layout";
 import { useChallenges } from "@/hooks/use-challenges";
 import { useProgress } from "@/hooks/use-progress";
 import { Link } from "wouter";
-import { Flag, Shield, Bug, Smartphone, Network, Lock, Globe, BookOpen, ChevronRight, Loader2, CheckCircle2 } from "lucide-react";
+import { Flag, Loader2, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import type { LearningPath } from "@shared/schema";
+import { RadarIllustration } from "@/components/illustrations";
 
-const ICONS: Record<string, React.ElementType> = {
-  Shield, Bug, Smartphone, Network, Lock, Globe, BookOpen, Flag,
-};
-
-const COLORS: Record<string, { text: string; bg: string; border: string }> = {
-  blue:   { text: "text-blue-400",   bg: "bg-blue-400/10",   border: "border-blue-400/20" },
-  green:  { text: "text-green-400",  bg: "bg-green-400/10",  border: "border-green-400/20" },
-  purple: { text: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-400/20" },
-  teal:   { text: "text-teal-400",   bg: "bg-teal-400/10",   border: "border-teal-400/20" },
-  amber:  { text: "text-amber-400",  bg: "bg-amber-400/10",  border: "border-amber-400/20" },
-  red:    { text: "text-red-400",    bg: "bg-red-400/10",    border: "border-red-400/20" },
+const MASCOT: Record<string, {
+  src: string; accent: string; accentDim: string;
+  glow: string; border: string; label: string;
+}> = {
+  "malware-analysis": {
+    src: "/images/quarantine_blob_neutral.png",
+    accent: "#e24b4a", accentDim: "rgba(226,75,74,0.12)",
+    glow: "rgba(220,50,50,0.10)", border: "rgba(226,75,74,0.25)",
+    label: "THREAT ANALYSIS",
+  },
+  "android-security": {
+    src: "/images/droidghost_neutral.png",
+    accent: "#22c55e", accentDim: "rgba(34,197,94,0.12)",
+    glow: "rgba(34,197,94,0.10)", border: "rgba(34,197,94,0.25)",
+    label: "MOBILE SECURITY",
+  },
 };
 
 export default function ChallengesIndex() {
@@ -39,7 +45,11 @@ export default function ChallengesIndex() {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto relative">
+        {/* Radar illustration — top right ambient */}
+        <div className="absolute right-[-60px] top-[-20px] pointer-events-none select-none opacity-[0.12]" style={{width:"340px"}}>
+          <RadarIllustration className="w-full" />
+        </div>
         <div className="text-center mb-12 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10" />
           <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-4">
@@ -57,9 +67,7 @@ export default function ChallengesIndex() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {paths?.map((path, idx) => {
-              const Icon = ICONS[path.icon] || Shield;
-              const color = COLORS[path.color] || COLORS.blue;
-
+              const m = MASCOT[path.slug] ?? MASCOT["malware-analysis"];
               const pathChallenges = allChallenges?.filter(c => c.learningPathSlug === path.slug) ?? [];
               const solved = pathChallenges.filter(c => solvedIds.has(c.id)).length;
               const total = pathChallenges.length;
@@ -69,39 +77,70 @@ export default function ChallengesIndex() {
                   key={path.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.08 }}
+                  transition={{ delay: idx * 0.1 }}
                 >
                   <Link href={`/challenges/path/${path.slug}`}>
-                    <div className={`group bg-card border ${color.border} rounded-xl p-6 cursor-pointer hover:shadow-2xl hover:-translate-y-1 transition-all duration-300`}>
-                      <div className="flex items-start gap-4">
-                        <div className={`w-12 h-12 rounded-xl ${color.bg} ${color.text} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
-                          <Icon className="w-6 h-6" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h2 className={`text-xl font-bold mb-1 group-hover:${color.text} transition-colors`}>
-                            {path.title}
-                          </h2>
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                            {path.description}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Flag className={`w-4 h-4 ${color.text}`} />
-                              <span className="text-xs font-mono text-muted-foreground">
-                                {solved}/{total} FLAGS CAPTURED
-                              </span>
-                            </div>
-                            {total > 0 && (
-                              <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full rounded-full ${color.bg} border ${color.border}`}
-                                  style={{ width: `${total > 0 ? (solved / total) * 100 : 0}%`, background: 'currentColor' }}
+                    <div
+                      className="group relative overflow-hidden rounded-xl border cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                      style={{ borderColor: m.border, background: "#0e1220", height: "220px" }}
+                    >
+                      {/* Mascot */}
+                      <div
+                        className="absolute bottom-0 right-0 pointer-events-none select-none overflow-hidden"
+                        style={{ width: "180px", height: "180px" }}
+                      >
+                        <img
+                          src={m.src}
+                          alt=""
+                          className="absolute bottom-0 right-0 group-hover:opacity-50 transition-opacity duration-300"
+                          style={{ height: "180px", width: "auto", opacity: 0.3 }}
+                        />
+                      </div>
+
+                      {/* Glow */}
+                      <div
+                        className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ background: `radial-gradient(ellipse at 85% 70%, ${m.glow} 0%, transparent 60%)` }}
+                      />
+
+                      {/* Content */}
+                      <div className="relative z-10 p-6 flex flex-col h-full" style={{ maxWidth: "72%" }}>
+                        <p className="text-[9px] font-mono tracking-[3px] uppercase mb-2" style={{ color: m.accent }}>
+                          {m.label}
+                        </p>
+                        <h2 className="text-2xl font-bold mb-2 group-hover:text-white transition-colors">
+                          {path.title}
+                        </h2>
+                        <p className="text-sm text-muted-foreground leading-relaxed mb-auto line-clamp-2">
+                          {path.description}
+                        </p>
+
+                        {/* Stats */}
+                        <div className="flex items-center gap-3 mt-4 mb-3">
+                          <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+                            <Flag className="w-3.5 h-3.5" style={{ color: m.accent }} />
+                            <span>{solved}/{total} flags captured</span>
+                          </div>
+                          {total > 0 && (
+                            <>
+                              <div className="w-px h-3 bg-border" />
+                              <div className="flex-1 max-w-[80px] h-[2px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                                <motion.div
+                                  className="h-full rounded-full"
+                                  style={{ background: m.accent }}
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${(solved / total) * 100}%` }}
+                                  transition={{ duration: 0.8, ease: "easeOut", delay: idx * 0.1 + 0.3 }}
                                 />
                               </div>
-                            )}
-                          </div>
+                            </>
+                          )}
                         </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors self-center" />
+
+                        <div className="inline-flex items-center gap-1.5 text-sm font-medium" style={{ color: m.accent }}>
+                          <span>Start Challenges</span>
+                          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </div>
                     </div>
                   </Link>

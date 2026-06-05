@@ -24,10 +24,10 @@ const MASCOT: Record<string, {
   },
   "android-security": {
     src: "/images/droidghost_neutral.png",
-    accent: "#20dcbe",
-    accentDim: "rgba(32,220,190,0.10)",
-    glow: "rgba(32,220,190,0.10)",
-    border: "rgba(32,220,190,0.20)",
+    accent: "#22c55e",
+    accentDim: "rgba(34,197,94,0.10)",
+    glow: "rgba(34,197,94,0.10)",
+    border: "rgba(34,197,94,0.20)",
     label: "// ANDROID SECURITY PATH",
     badgeCompleted: "bg-teal-500/10 text-teal-400 border-teal-500/20",
   },
@@ -174,19 +174,20 @@ export default function LessonsList() {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <div className="flex flex-col gap-2 mb-1">
                             <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
                               {lesson.category}
                             </span>
-                            <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-                            <Badge variant="outline" className={`text-[10px] font-mono uppercase ${diffClass}`}>
-                              {lesson.difficulty}
-                            </Badge>
-                            {isCompleted && (
-                              <Badge variant="outline" className={`text-[10px] font-mono uppercase ${m.badgeCompleted}`}>
-                                Completed
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className={`text-[10px] font-mono uppercase ${diffClass} w-fit`}>
+                                {lesson.difficulty}
                               </Badge>
-                            )}
+                              {isCompleted && (
+                                <Badge variant="outline" className={`text-[10px] font-mono uppercase ${m.badgeCompleted} w-fit`}>
+                                  Completed
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                           <h3 className="text-base font-semibold transition-colors truncate group-hover:text-white">
                             {lesson.title}

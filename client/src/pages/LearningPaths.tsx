@@ -7,6 +7,7 @@ import { Link } from "wouter";
 import { ChevronRight, Loader2, BookOpen, Flag } from "lucide-react";
 import { motion } from "framer-motion";
 import type { LearningPath } from "@shared/schema";
+import { NetworkGraphIllustration } from "@/components/illustrations";
 
 const MASCOT: Record<string, {
   src: string; accent: string; accentDim: string;
@@ -20,8 +21,8 @@ const MASCOT: Record<string, {
   },
   "android-security": {
     src: "/images/droidghost_neutral.png",
-    accent: "#20dcbe", accentDim: "rgba(32,220,190,0.12)",
-    glow: "rgba(32,220,190,0.10)", border: "rgba(32,220,190,0.25)",
+    accent: "#22c55e", accentDim: "rgba(34,197,94,0.12)",
+    glow: "rgba(34,197,94,0.10)", border: "rgba(34,197,94,0.25)",
     label: "MOBILE SECURITY",
   },
 };
@@ -48,7 +49,11 @@ export default function LearningPaths() {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto relative">
+        {/* Network graph illustration — top right ambient */}
+        <div className="absolute right-[-80px] top-[-40px] pointer-events-none select-none opacity-[0.12]" style={{width:"380px"}}>
+          <NetworkGraphIllustration className="w-full" />
+        </div>
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-3">Learning Paths</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">

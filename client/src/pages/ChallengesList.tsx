@@ -27,8 +27,8 @@ const MASCOT: Record<string, { src: string; accent: string; glow: string; label:
   },
   "android-security": {
     src: "/images/droidghost_neutral.png",
-    accent: "#20dcbe",
-    glow: "rgba(32,220,190,0.10)",
+    accent: "#22c55e",
+    glow: "rgba(34,197,94,0.10)",
     label: "// ANDROID SECURITY PATH",
   },
 };
