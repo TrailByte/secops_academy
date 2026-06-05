@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { lessons, quizzes, challenges, userProgress, quizAnswers, type Lesson, type Quiz, type Challenge, type InsertLesson, type Progress, type QuizAnswer } from "@shared/schema";
+import { lessons, quizzes, challenges, userProgress, quizAnswers, learningPaths, type Lesson, type Quiz, type Challenge, type InsertLesson, type Progress, type QuizAnswer, type LearningPath } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
@@ -15,9 +15,21 @@ export interface IStorage {
   updateProgress(userId: string, resourceType: string, resourceId: number): Promise<Progress>;
   getQuizAnswers(userId: string, lessonId: number): Promise<QuizAnswer[]>;
   saveQuizAnswer(userId: string, quizId: number, lessonId: number, selectedAnswer: number, isCorrect: boolean): Promise<QuizAnswer>;
+  getLearningPaths(): Promise<LearningPath[]>;
+  getLearningPath(slug: string): Promise<LearningPath | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
+  
+  async getLearningPaths(): Promise<LearningPath[]> {
+    return await db.select().from(learningPaths).orderBy(learningPaths.order);
+  }
+
+  async getLearningPath(slug: string): Promise<LearningPath | undefined> {
+    const [path] = await db.select().from(learningPaths).where(eq(learningPaths.slug, slug));
+    return path;
+  }
+
   async getLessons(): Promise<Lesson[]> {
     return await db.select().from(lessons).orderBy(lessons.order);
   }

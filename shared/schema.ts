@@ -3,15 +3,27 @@ import { pgTable, text, serial, integer, boolean, jsonb, timestamp, varchar } fr
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Learning Paths (e.g. "Malware Analysis", "Android Security")
+export const learningPaths = pgTable("learning_paths", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull().default("Shield"), // lucide icon name
+  color: text("color").notNull().default("blue"), // tailwind color key
+  order: integer("order").notNull().default(0),
+});
+
 // Lesson content (Theory)
 export const lessons = pgTable("lessons", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   slug: text("slug").notNull().unique(),
-  content: text("content").notNull(), // Markdown content
+  content: text("content").notNull(),
   order: integer("order").notNull(),
-  category: text("category").notNull(), // 'static', 'dynamic', 'intro', etc.
-  difficulty: text("difficulty").default("Beginner"), // Beginner, Intermediate, Advanced
+  category: text("category").notNull(),
+  difficulty: text("difficulty").default("Beginner"),
+  learningPathSlug: text("learning_path_slug").references(() => learningPaths.slug),
 });
 
 // Quizzes (Multiple choice)
@@ -19,9 +31,9 @@ export const quizzes = pgTable("quizzes", {
   id: serial("id").primaryKey(),
   lessonId: integer("lesson_id").references(() => lessons.id),
   question: text("question").notNull(),
-  options: jsonb("options").notNull(), // Array of strings
-  correctAnswer: integer("correct_answer").notNull(), // Index of correct option
-  explanation: text("explanation"), // Why this is the correct answer
+  options: jsonb("options").notNull(),
+  correctAnswer: integer("correct_answer").notNull(),
+  explanation: text("explanation"),
 });
 
 // CTF Challenges (Practical)
@@ -29,12 +41,13 @@ export const challenges = pgTable("challenges", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  difficulty: text("difficulty").notNull(), // 'Easy', 'Medium', 'Hard'
-  category: text("category").notNull(), // 'static-analysis', 'decoding', etc.
-  flag: text("flag").notNull(), // The answer to submit
-  hints: jsonb("hints").notNull(), // Array of hint strings
-  artifact: text("artifact"), // Code snippet, hex dump, or link to file
-  technicalContext: text("technical_context"), // Deep dive into the "why"
+  difficulty: text("difficulty").notNull(),
+  category: text("category").notNull(),
+  flag: text("flag").notNull(),
+  hints: jsonb("hints").notNull(),
+  artifact: text("artifact"),
+  technicalContext: text("technical_context"),
+  learningPathSlug: text("learning_path_slug").references(() => learningPaths.slug),
 });
 
 // Quiz Answer Tracking
@@ -48,16 +61,17 @@ export const quizAnswers = pgTable("quiz_answers", {
   answeredAt: timestamp("answered_at").defaultNow(),
 });
 
-// Progress Tracking (Local-only for this simple version, but schema defined for future)
+// Progress Tracking
 export const userProgress = pgTable("user_progress", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull(), // Temporary placeholder for future auth
-  resourceType: text("resource_type").notNull(), // 'lesson' or 'challenge'
+  userId: varchar("user_id").notNull(),
+  resourceType: text("resource_type").notNull(),
   resourceId: integer("resource_id").notNull(),
   completedAt: timestamp("completed_at").defaultNow(),
 });
 
 // Schemas
+export const insertLearningPathSchema = createInsertSchema(learningPaths);
 export const insertLessonSchema = createInsertSchema(lessons);
 export const insertQuizSchema = createInsertSchema(quizzes);
 export const insertChallengeSchema = createInsertSchema(challenges);
@@ -65,6 +79,7 @@ export const insertProgressSchema = createInsertSchema(userProgress);
 export const insertQuizAnswerSchema = createInsertSchema(quizAnswers).omit({ id: true, answeredAt: true });
 
 // Types
+export type LearningPath = typeof learningPaths.$inferSelect;
 export type Lesson = typeof lessons.$inferSelect;
 export type InsertLesson = z.infer<typeof insertLessonSchema>;
 export type Quiz = typeof quizzes.$inferSelect;

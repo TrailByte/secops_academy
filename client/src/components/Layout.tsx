@@ -10,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { href: "/", label: "Dashboard", icon: Shield },
     { href: "/introduction", label: "Introduction", icon: Info },
-    { href: "/lessons", label: "Lessons", icon: BookOpen },
+    { href: "/learn", label: "Learning Paths", icon: BookOpen },
     { href: "/challenges", label: "CTF Challenges", icon: Flag },
   ];
 
@@ -36,7 +36,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
-              const isActive = location === item.href || (location.startsWith(item.href) && item.href !== "/");
+              const isActive = location === item.href || (item.href === "/learn" && location.startsWith("/learn")) ||(item.href === "/challenges" && location.startsWith("/challenges")) || (item.href === "/introduction" && location.startsWith("/introduction"));
               const Icon = item.icon;
               return (
                 <Link key={item.href} href={item.href}>
@@ -78,7 +78,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             <nav className="flex flex-col p-4 gap-2">
               {navItems.map((item) => {
-                const isActive = location === item.href;
+                const isActive = location === item.href || (item.href === "/learn" && location.startsWith("/learn")) || (item.href === "/challenges" && location.startsWith("/challenges")) || (item.href === "/introduction" && location.startsWith("/introduction"));
                 const Icon = item.icon;
                 return (
                   <Link key={item.href} href={item.href}>

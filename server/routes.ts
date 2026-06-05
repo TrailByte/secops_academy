@@ -8,6 +8,18 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  app.get("/api/learning-paths", async (req, res) => {
+    const paths = await storage.getLearningPaths();
+    res.json(paths);
+  });
+
+  app.get("/api/learning-paths/:slug", async (req, res) => {
+    const path = await storage.getLearningPath(req.params.slug);
+    if (!path) return res.status(404).json({ message: "Learning path not found" });
+    res.json(path);
+  });
+
   app.get(api.lessons.list.path, async (req, res) => {
     const lessons = await storage.getLessons();
     res.json(lessons);

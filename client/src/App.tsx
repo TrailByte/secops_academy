@@ -7,19 +7,26 @@ import NotFound from "@/pages/not-found";
 
 import Home from "@/pages/Home";
 import Introduction from "@/pages/Introduction";
+import LearningPaths from "@/pages/LearningPaths";
 import LessonsList from "@/pages/LessonsList";
 import LessonDetail from "@/pages/LessonDetail";
 import ChallengesList from "@/pages/ChallengesList";
 import ChallengeDetail from "@/pages/ChallengeDetail";
+import ChallengesIndex from "@/pages/ChallengesIndex";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/introduction" component={Introduction} />
-      <Route path="/lessons" component={LessonsList} />
+      {/* Learning paths index */}
+      <Route path="/learn" component={LearningPaths} />
+      {/* Lessons filtered by path */}
+      <Route path="/learn/:pathSlug/lessons" component={LessonsList} />
       <Route path="/lessons/:id" component={LessonDetail} />
-      <Route path="/challenges" component={ChallengesList} />
+      {/* Challenges filtered by path */}
+      <Route path="/challenges" component={ChallengesIndex} />
+      <Route path="/challenges/path/:pathSlug" component={ChallengesList} />
       <Route path="/challenges/:id" component={ChallengeDetail} />
       <Route component={NotFound} />
     </Switch>
