@@ -1,27 +1,29 @@
 import Layout from "@/components/Layout";
 import { useQuery } from "@tanstack/react-query";
 import { useProgress } from "@/hooks/use-progress";
+import { useLessons } from "@/hooks/use-lessons";
+import { useChallenges } from "@/hooks/use-challenges";
 import { Link } from "wouter";
-import {
-  Shield, Bug, Smartphone, Network, Lock, Globe,
-  ChevronRight, Loader2, BookOpen, Flag, CheckCircle2
-} from "lucide-react";
+import { ChevronRight, Loader2, BookOpen, Flag } from "lucide-react";
 import { motion } from "framer-motion";
 import type { LearningPath } from "@shared/schema";
 
-// Map icon name strings to lucide components
-const ICONS: Record<string, React.ElementType> = {
-  Shield, Bug, Smartphone, Network, Lock, Globe, BookOpen, Flag,
-};
-
-// Map color keys to tailwind classes
-const COLORS: Record<string, { text: string; bg: string; border: string; glow: string }> = {
-  blue:   { text: "text-blue-400",   bg: "bg-blue-400/10",   border: "border-blue-400/20",   glow: "group-hover:shadow-blue-500/10" },
-  green:  { text: "text-green-400",  bg: "bg-green-400/10",  border: "border-green-400/20",  glow: "group-hover:shadow-green-500/10" },
-  purple: { text: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-400/20", glow: "group-hover:shadow-purple-500/10" },
-  teal:   { text: "text-teal-400",   bg: "bg-teal-400/10",   border: "border-teal-400/20",   glow: "group-hover:shadow-teal-500/10" },
-  amber:  { text: "text-amber-400",  bg: "bg-amber-400/10",  border: "border-amber-400/20",  glow: "group-hover:shadow-amber-500/10" },
-  red:    { text: "text-red-400",    bg: "bg-red-400/10",    border: "border-red-400/20",    glow: "group-hover:shadow-red-500/10" },
+const MASCOT: Record<string, {
+  src: string; accent: string; accentDim: string;
+  glow: string; border: string; label: string;
+}> = {
+  "malware-analysis": {
+    src: "/images/quarantine_blob_neutral.png",
+    accent: "#e24b4a", accentDim: "rgba(226,75,74,0.12)",
+    glow: "rgba(220,50,50,0.10)", border: "rgba(226,75,74,0.25)",
+    label: "THREAT ANALYSIS",
+  },
+  "android-security": {
+    src: "/images/droidghost_neutral.png",
+    accent: "#20dcbe", accentDim: "rgba(32,220,190,0.12)",
+    glow: "rgba(32,220,190,0.10)", border: "rgba(32,220,190,0.25)",
+    label: "MOBILE SECURITY",
+  },
 };
 
 export default function LearningPaths() {
@@ -29,12 +31,14 @@ export default function LearningPaths() {
     queryKey: ["/api/learning-paths"],
     queryFn: async () => {
       const res = await fetch("/api/learning-paths");
-      if (!res.ok) throw new Error("Failed to fetch learning paths");
+      if (!res.ok) throw new Error("Failed to fetch");
       return res.json();
     },
   });
-
+  const { data: allLessons } = useLessons();
+  const { data: allChallenges } = useChallenges();
   const { data: progress } = useProgress();
+
   const completedLessonIds = new Set(
     (progress || []).filter(p => p.resourceType === "lesson").map(p => p.resourceId)
   );
@@ -46,9 +50,7 @@ export default function LearningPaths() {
     <Layout>
       <div className="max-w-5xl mx-auto">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-4">
-            Learning Paths
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-3">Learning Paths</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
             Choose a specialization. Each path contains theory modules and hands-on CTF challenges.
           </p>
@@ -61,31 +63,87 @@ export default function LearningPaths() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {paths?.map((path, idx) => {
-              const Icon = ICONS[path.icon] || Shield;
-              const color = COLORS[path.color] || COLORS.blue;
+              const m = MASCOT[path.slug] ?? MASCOT["malware-analysis"];
+              const pathLessons = allLessons?.filter(l => l.learningPathSlug === path.slug) ?? [];
+              const pathChallenges = allChallenges?.filter(c => c.learningPathSlug === path.slug) ?? [];
+              const completedLessons = pathLessons.filter(l => completedLessonIds.has(l.id)).length;
+              const solvedChallenges = pathChallenges.filter(c => solvedChallengeIds.has(c.id)).length;
 
               return (
                 <motion.div
                   key={path.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.08 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="h-full"
                 >
                   <Link href={`/learn/${path.slug}/lessons`}>
-                    <div className={`group bg-card border ${color.border} rounded-xl p-6 cursor-pointer hover:shadow-2xl ${color.glow} transition-all duration-300 hover:-translate-y-1`}>
-                      <div className={`w-12 h-12 rounded-xl ${color.bg} ${color.text} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                        <Icon className="w-6 h-6" />
+                    {/* Fixed height card so both cards are equal */}
+                    <div
+                      className="group relative overflow-hidden rounded-xl border cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                      style={{ borderColor: m.border, background: "#0e1220", height: "260px" }}
+                    >
+                      {/* Mascot — fixed size container bottom-right */}
+                      <div
+                        className="absolute bottom-0 right-0 pointer-events-none select-none overflow-hidden"
+                        style={{ width: "180px", height: "180px" }}
+                      >
+                        <img
+                          src={m.src}
+                          alt=""
+                          className="absolute bottom-0 right-0 group-hover:opacity-50 transition-opacity duration-300"
+                          style={{ height: "180px", width: "auto", opacity: 0.3, objectFit: "contain" }}
+                        />
                       </div>
-                      <h2 className={`text-2xl font-bold mb-2 group-hover:${color.text} transition-colors`}>
-                        {path.title}
-                      </h2>
-                      <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                        {path.description}
-                      </p>
-                      <div className={`flex items-center gap-2 text-sm font-medium ${color.text}`}>
-                        <BookOpen className="w-4 h-4" />
-                        <span>View Modules</span>
-                        <ChevronRight className="w-4 h-4 ml-auto" />
+
+                      {/* Glow */}
+                      <div
+                        className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ background: `radial-gradient(ellipse at 85% 70%, ${m.glow} 0%, transparent 60%)` }}
+                      />
+
+                      {/* Content */}
+                      <div className="relative z-10 p-6 flex flex-col h-full" style={{ maxWidth: "72%" }}>
+                        <p className="text-[9px] font-mono tracking-[3px] uppercase mb-2" style={{ color: m.accent }}>
+                          {m.label}
+                        </p>
+                        <h2 className="text-2xl font-bold mb-2 group-hover:text-white transition-colors">
+                          {path.title}
+                        </h2>
+                        <p className="text-sm text-muted-foreground leading-relaxed mb-auto line-clamp-2">
+                          {path.description}
+                        </p>
+
+                        {/* Stats */}
+                        <div className="flex items-center gap-4 mt-4 mb-3">
+                          <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+                            <BookOpen className="w-3.5 h-3.5" style={{ color: m.accent }} />
+                            <span>{completedLessons}/{pathLessons.length} modules</span>
+                          </div>
+                          <div className="w-px h-3 bg-border" />
+                          <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+                            <Flag className="w-3.5 h-3.5" style={{ color: m.accent }} />
+                            <span>{solvedChallenges}/{pathChallenges.length} flags</span>
+                          </div>
+                        </div>
+
+                        {/* Progress bar */}
+                        {pathLessons.length > 0 && (
+                          <div className="mb-3 h-[2px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                            <motion.div
+                              className="h-full rounded-full"
+                              style={{ background: m.accent }}
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(completedLessons / pathLessons.length) * 100}%` }}
+                              transition={{ duration: 0.8, ease: "easeOut", delay: idx * 0.1 + 0.3 }}
+                            />
+                          </div>
+                        )}
+
+                        <div className="inline-flex items-center gap-1.5 text-sm font-medium" style={{ color: m.accent }}>
+                          <span>View Modules</span>
+                          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </div>
                     </div>
                   </Link>

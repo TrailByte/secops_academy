@@ -1,21 +1,46 @@
 import Layout from "@/components/Layout";
 import { useLessons } from "@/hooks/use-lessons";
 import { useProgress } from "@/hooks/use-progress";
-import { Link, useRoute } from "wouter";
+import { Link, useParams } from "wouter";
 import { BookOpen, ChevronRight, Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import type { LearningPath } from "@shared/schema";
 
-const difficultyConfig: Record<string, { className: string }> = {
-  Beginner:     { className: "bg-green-500/10 text-green-400 border-green-500/20" },
-  Intermediate: { className: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
-  Advanced:     { className: "bg-red-500/10 text-red-400 border-red-500/20" },
+const MASCOT: Record<string, {
+  src: string; accent: string; accentDim: string;
+  glow: string; border: string; label: string;
+  badgeCompleted: string;
+}> = {
+  "malware-analysis": {
+    src: "/images/quarantine_blob_neutral.png",
+    accent: "#e24b4a",
+    accentDim: "rgba(226,75,74,0.10)",
+    glow: "rgba(220,50,50,0.10)",
+    border: "rgba(226,75,74,0.20)",
+    label: "// MALWARE ANALYSIS PATH",
+    badgeCompleted: "bg-red-500/10 text-red-400 border-red-500/20",
+  },
+  "android-security": {
+    src: "/images/droidghost_neutral.png",
+    accent: "#20dcbe",
+    accentDim: "rgba(32,220,190,0.10)",
+    glow: "rgba(32,220,190,0.10)",
+    border: "rgba(32,220,190,0.20)",
+    label: "// ANDROID SECURITY PATH",
+    badgeCompleted: "bg-teal-500/10 text-teal-400 border-teal-500/20",
+  },
+};
+
+const difficultyConfig: Record<string, string> = {
+  Beginner:     "bg-green-500/10 text-green-400 border-green-500/20",
+  Intermediate: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  Advanced:     "bg-red-500/10 text-red-400 border-red-500/20",
 };
 
 export default function LessonsList() {
-  const [, params] = useRoute("/learn/:pathSlug/lessons");
+  const params = useParams<{ pathSlug: string }>();
   const pathSlug = params?.pathSlug;
 
   const { data: allLessons, isLoading, error } = useLessons();
@@ -30,62 +55,73 @@ export default function LessonsList() {
     enabled: !!pathSlug,
   });
 
-  // Filter lessons for this learning path
   const lessons = allLessons?.filter(l => l.learningPathSlug === pathSlug) ?? [];
-
-  const completedLessonIds = new Set(
+  const completedIds = new Set(
     (progress || []).filter(p => p.resourceType === "lesson").map(p => p.resourceId)
   );
-
-  const completedCount = lessons.filter(l => completedLessonIds.has(l.id)).length;
+  const completedCount = lessons.filter(l => completedIds.has(l.id)).length;
   const totalCount = lessons.length;
+  const pct = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  const m = MASCOT[pathSlug ?? ""] ?? MASCOT["malware-analysis"];
 
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
-        {/* Back button */}
         <Link href="/learn">
-          <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8 group">
+          <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 group">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             All Learning Paths
           </button>
         </Link>
 
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-          <div>
-            <p className="text-xs font-mono text-primary uppercase tracking-widest mb-2">
-              {path?.title ?? pathSlug}
-            </p>
-            <h1 className="text-3xl md:text-4xl font-bold font-display tracking-tight mb-2">
-              Training Modules
-            </h1>
-            <p className="text-muted-foreground">Select a module to begin your training sequence.</p>
+        {/* ── HERO HEADER ── */}
+        <div
+          className="relative overflow-hidden rounded-xl mb-8 border"
+          style={{ borderColor: m.border, background: "#0e1220" }}
+        >
+          {/* Mascot */}
+          <div className="absolute right-0 bottom-0 pointer-events-none select-none">
+            <img src={m.src} alt="" style={{ height: "220px", opacity: 0.45 }} />
           </div>
-          <div className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-primary text-xs font-mono shrink-0">
-            {completedCount}/{totalCount} COMPLETED
+          {/* Glow */}
+          <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 85% 60%, ${m.glow} 0%, transparent 65%)` }} />
+
+          <div className="relative z-10 p-8" style={{ maxWidth: "62%" }}>
+            <p className="text-[9px] font-mono tracking-[3px] uppercase mb-2" style={{ color: m.accent }}>
+              {m.label}
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight mb-2">Training Modules</h1>
+            <p className="text-sm text-muted-foreground mb-5">
+              Select a module to begin your training sequence.
+            </p>
+            <div className="flex items-center gap-4">
+              <div
+                className="text-[11px] font-mono px-3 py-1.5 rounded-full border"
+                style={{ background: m.accentDim, borderColor: m.border, color: m.accent }}
+              >
+                {completedCount}/{totalCount} COMPLETED
+              </div>
+              <div className="flex-1 max-w-[160px] h-[2px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ background: m.accent }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {completedCount > 0 && totalCount > 0 && (
-          <div className="mb-8">
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-primary rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${(completedCount / totalCount) * 100}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-              />
-            </div>
-          </div>
-        )}
-
+        {/* ── MODULE LIST ── */}
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            <Loader2 className="w-8 h-8 animate-spin" style={{ color: m.accent }} />
           </div>
         ) : error ? (
           <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-center">
-            Failed to load modules. Please refresh.
+            Failed to load modules.
           </div>
         ) : lessons.length === 0 ? (
           <div className="text-center py-24 text-muted-foreground">
@@ -93,50 +129,75 @@ export default function LessonsList() {
             <p className="font-mono text-sm">No modules yet for this path.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {lessons.map((lesson, idx) => {
-              const isCompleted = completedLessonIds.has(lesson.id);
-              const diff = difficultyConfig[lesson.difficulty ?? "Beginner"] ?? difficultyConfig.Beginner;
+              const isCompleted = completedIds.has(lesson.id);
+              const diffClass = difficultyConfig[lesson.difficulty ?? "Beginner"] ?? difficultyConfig.Beginner;
 
               return (
                 <motion.div
                   key={lesson.id}
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
+                  transition={{ delay: idx * 0.04 }}
                 >
                   <Link href={`/lessons/${lesson.id}`}>
-                    <div className={`group relative bg-card hover:bg-card/80 border rounded-xl p-6 transition-all cursor-pointer overflow-hidden ${
-                      isCompleted ? "border-green-500/30" : "border-border hover:border-primary/50"
-                    }`}>
-                      <div className="flex items-start gap-4">
-                        <div className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center font-mono font-bold text-lg border transition-transform group-hover:scale-105 ${
-                          isCompleted
-                            ? "bg-green-500/10 text-green-400 border-green-500/20"
-                            : "bg-primary/10 text-primary border-primary/20"
-                        }`}>
-                          {isCompleted ? <CheckCircle2 className="w-6 h-6" /> : String(idx + 1).padStart(2, "0")}
+                    <div
+                      className="group relative rounded-xl p-5 cursor-pointer transition-all duration-200 border overflow-hidden"
+                      style={{
+                        background: "#0e1220",
+                        borderColor: isCompleted ? `${m.accent}33` : "rgba(255,255,255,0.06)",
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLElement).style.borderColor = `${m.accent}55`;
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLElement).style.borderColor = isCompleted ? `${m.accent}33` : "rgba(255,255,255,0.06)";
+                      }}
+                    >
+                      {/* Left accent bar */}
+                      <div
+                        className="absolute left-0 top-0 bottom-0 w-[2px] rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                        style={{ background: m.accent }}
+                      />
+
+                      <div className="flex items-center gap-4">
+                        {/* Number badge */}
+                        <div
+                          className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-mono font-bold text-sm border transition-transform group-hover:scale-105"
+                          style={isCompleted
+                            ? { background: `${m.accent}18`, borderColor: `${m.accent}44`, color: m.accent }
+                            : { background: `${m.accent}0e`, borderColor: `${m.accent}28`, color: m.accent }
+                          }
+                        >
+                          {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : String(idx + 1).padStart(2, "0")}
                         </div>
+
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
                               {lesson.category}
                             </span>
                             <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-                            <Badge variant="outline" className={`text-[10px] font-mono uppercase ${diff.className}`}>
+                            <Badge variant="outline" className={`text-[10px] font-mono uppercase ${diffClass}`}>
                               {lesson.difficulty}
                             </Badge>
                             {isCompleted && (
-                              <Badge variant="outline" className="text-[10px] font-mono uppercase bg-green-500/10 text-green-400 border-green-500/20">
+                              <Badge variant="outline" className={`text-[10px] font-mono uppercase ${m.badgeCompleted}`}>
                                 Completed
                               </Badge>
                             )}
                           </div>
-                          <h3 className="text-xl font-bold group-hover:text-primary transition-colors truncate">
+                          <h3 className="text-base font-semibold transition-colors truncate group-hover:text-white">
                             {lesson.title}
                           </h3>
                         </div>
-                        <ChevronRight className="self-center w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+
+                        <ChevronRight
+                          className="flex-shrink-0 w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-all"
+                          style={{ color: undefined }}
+                          onMouseEnter={() => {}}
+                        />
                       </div>
                     </div>
                   </Link>
