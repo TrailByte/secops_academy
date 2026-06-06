@@ -56,7 +56,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
-
+          {/* Rank pill */}
+          <div className="hidden md:flex items-center gap-2 ml-4 pl-4 border-l border-border">
+            <img 
+              src="/images/ranks/rookie.png" 
+              alt="Rank" 
+              className="h-7 w-auto"
+            />
+            <div className="flex flex-col">
+              <span className="font-mono text-[10px] font-bold text-muted-foreground tracking-wider leading-none">ROOKIE</span>
+              <span className="font-mono text-[9px] text-muted-foreground/50 leading-none mt-0.5">0 XP</span>
+            </div>
+          </div>
           {/* Mobile Menu Toggle */}
           <button
             className="md:hidden p-2 text-muted-foreground hover:text-foreground"

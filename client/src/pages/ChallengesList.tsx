@@ -20,13 +20,13 @@ const getDifficultyColor = (diff: string) => {
 
 const MASCOT: Record<string, { src: string; accent: string; glow: string; label: string }> = {
   "malware-analysis": {
-    src: "/images/quarantine_blob_neutral.png",
+    src: "/images/mascots/quarantine_blob_neutral.png",
     accent: "#e24b4a",
     glow: "rgba(220,50,50,0.10)",
     label: "// MALWARE ANALYSIS PATH",
   },
   "android-security": {
-    src: "/images/droidghost_neutral.png",
+    src: "/images/mascots/droidghost_neutral.png",
     accent: "#22c55e",
     glow: "rgba(34,197,94,0.10)",
     label: "// ANDROID SECURITY PATH",

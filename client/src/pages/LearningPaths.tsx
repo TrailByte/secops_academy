@@ -14,13 +14,13 @@ const MASCOT: Record<string, {
   glow: string; border: string; label: string;
 }> = {
   "malware-analysis": {
-    src: "/images/quarantine_blob_neutral.png",
+    src: "/images/mascots/quarantine_blob_neutral.png",
     accent: "#e24b4a", accentDim: "rgba(226,75,74,0.12)",
     glow: "rgba(220,50,50,0.10)", border: "rgba(226,75,74,0.25)",
     label: "THREAT ANALYSIS",
   },
   "android-security": {
-    src: "/images/droidghost_neutral.png",
+    src: "/images/mascots/droidghost_neutral.png",
     accent: "#22c55e", accentDim: "rgba(34,197,94,0.12)",
     glow: "rgba(34,197,94,0.10)", border: "rgba(34,197,94,0.25)",
     label: "MOBILE SECURITY",
