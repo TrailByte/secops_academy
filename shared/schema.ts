@@ -24,6 +24,7 @@ export const lessons = pgTable("lessons", {
   category: text("category").notNull(),
   difficulty: text("difficulty").default("Beginner"),
   learningPathSlug: text("learning_path_slug").references(() => learningPaths.slug),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Quizzes (Multiple choice)
@@ -48,6 +49,7 @@ export const challenges = pgTable("challenges", {
   artifact: text("artifact"),
   technicalContext: text("technical_context"),
   learningPathSlug: text("learning_path_slug").references(() => learningPaths.slug),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Quiz Answer Tracking

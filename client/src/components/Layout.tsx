@@ -2,10 +2,36 @@ import { Link, useLocation } from "wouter";
 import { Shield, BookOpen, Flag, Menu, X, Info } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useProgress } from "@/hooks/use-progress";
+import { useLessons } from "@/hooks/use-lessons";
+import { useChallenges } from "@/hooks/use-challenges";
+import { getRank, calcMaxXP } from "@/lib/ranks";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { data: progress } = useProgress();
+  const { data: lessons } = useLessons();
+  const { data: challenges } = useChallenges();
+
+  // Calculate user XP
+  const completedLessons = (progress || []).filter(p => p.resourceType === "lesson").length;
+  const solvedChallengeIds = new Set((progress || []).filter(p => p.resourceType === "challenge").map(p => p.resourceId));
+  const solvedChallenges = (challenges || []).filter(c => solvedChallengeIds.has(c.id));
+
+  let userXP = completedLessons * 100;
+  for (const c of solvedChallenges) {
+    switch (c.difficulty?.toLowerCase()) {
+      case "easy":   userXP += 150; break;
+      case "medium": userXP += 300; break;
+      case "hard":
+      case "advanced": userXP += 500; break;
+      default: userXP += 300;
+    }
+  }
+
+  const maxXP = calcMaxXP(lessons?.length || 14, challenges || []);
+  const rank = getRank(userXP, maxXP);
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: Shield },
@@ -16,12 +42,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-black">
-      {/* Scanline overlay for retro feel */}
       <div className="scanline z-50 pointer-events-none fixed inset-0 opacity-[0.03]" />
 
-      {/* Top Navigation - Mobile & Desktop */}
       <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="mx-auto px-8 h-14 flex items-center justify-between w-full">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer group">
               <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
@@ -36,19 +60,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
-              const isActive = location === item.href || (item.href === "/learn" && location.startsWith("/learn")) ||(item.href === "/challenges" && location.startsWith("/challenges")) || (item.href === "/introduction" && location.startsWith("/introduction"));
+              const isActive =
+                location === item.href ||
+                (item.href === "/learn" && location.startsWith("/learn")) ||
+                (item.href === "/challenges" && location.startsWith("/challenges")) ||
+                (item.href === "/introduction" && location.startsWith("/introduction"));
               const Icon = item.icon;
               return (
                 <Link key={item.href} href={item.href}>
-                  <div
-                    className={`
-                      px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 transition-all cursor-pointer
-                      ${isActive 
-                        ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_10px_-5px_var(--primary)]" 
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                      }
-                    `}
-                  >
+                  <div className={`px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 transition-all cursor-pointer ${
+                    isActive
+                      ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_10px_-5px_var(--primary)]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}>
                     <Icon className="w-4 h-4" />
                     {item.label}
                   </div>
@@ -56,19 +80,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
+
           {/* Rank pill */}
-          <div className="hidden md:flex items-center gap-2 ml-4 pl-4 border-l border-border">
-            <img 
-              src="/images/ranks/rookie.png" 
-              alt="Rank" 
+          <div className="hidden md:flex items-center gap-2.5 ml-4 pl-4 border-l border-border">
+            <img
+              src={rank.badge}
+              alt={rank.gameTitle}
               className="h-7 w-auto"
             />
             <div className="flex flex-col">
-              <span className="font-mono text-[10px] font-bold text-muted-foreground tracking-wider leading-none">ROOKIE</span>
-              <span className="font-mono text-[9px] text-muted-foreground/50 leading-none mt-0.5">0 XP</span>
+              <span className="font-mono text-[10px] font-bold text-muted-foreground tracking-wider leading-none"
+                style={{ color: rank.color }}>
+                {rank.gameTitle}
+              </span>
+              <span className="font-mono text-[9px] text-muted-foreground/50 leading-none mt-0.5">
+                {userXP} XP
+              </span>
             </div>
           </div>
-          {/* Mobile Menu Toggle */}
+
           <button
             className="md:hidden p-2 text-muted-foreground hover:text-foreground"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -78,7 +108,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      {/* Mobile Menu Dropdown */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -89,19 +118,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             <nav className="flex flex-col p-4 gap-2">
               {navItems.map((item) => {
-                const isActive = location === item.href || (item.href === "/learn" && location.startsWith("/learn")) || (item.href === "/challenges" && location.startsWith("/challenges")) || (item.href === "/introduction" && location.startsWith("/introduction"));
+                const isActive =
+                  location === item.href ||
+                  (item.href === "/learn" && location.startsWith("/learn")) ||
+                  (item.href === "/challenges" && location.startsWith("/challenges")) ||
+                  (item.href === "/introduction" && location.startsWith("/introduction"));
                 const Icon = item.icon;
                 return (
                   <Link key={item.href} href={item.href}>
                     <div
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`
-                        px-4 py-3 rounded-md text-sm font-medium flex items-center gap-3 transition-colors cursor-pointer
-                        ${isActive 
-                          ? "bg-primary/10 text-primary border border-primary/20" 
+                      className={`px-4 py-3 rounded-md text-sm font-medium flex items-center gap-3 transition-colors cursor-pointer ${
+                        isActive
+                          ? "bg-primary/10 text-primary border border-primary/20"
                           : "text-muted-foreground hover:bg-muted"
-                        }
-                      `}
+                      }`}
                     >
                       <Icon className="w-5 h-5" />
                       {item.label}
