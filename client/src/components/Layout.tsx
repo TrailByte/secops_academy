@@ -45,19 +45,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div className="scanline z-50 pointer-events-none fixed inset-0 opacity-[0.03]" />
 
       <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto px-8 h-14 flex items-center justify-between w-full">
-          <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer group">
-              <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
-                <Shield className="w-5 h-5 text-primary" />
+        <div className="w-full px-8 h-16 flex items-center">
+          {/* Left — Logo */}
+          <div className="flex-1">
+            <Link href="/">
+              <div className="flex items-center gap-2 cursor-pointer group w-fit">
+                <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-colors">
+                  <Shield className="w-5 h-5 text-primary" />
+                </div>
+                <span className="font-display font-bold text-xl tracking-tight group-hover:text-primary transition-colors">
+                  SEC<span className="text-primary">OPS</span>_ACADEMY
+                </span>
               </div>
-              <span className="font-display font-bold text-xl tracking-tight group-hover:text-primary transition-colors">
-                SEC<span className="text-primary">OPS</span>_ACADEMY
-              </span>
-            </div>
-          </Link>
+            </Link>
+          </div>
 
-          {/* Desktop Nav */}
+          {/* Center — Nav links */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive =
@@ -81,30 +84,26 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          {/* Rank pill */}
-          <div className="hidden md:flex items-center gap-2.5 ml-4 pl-4 border-l border-border">
-            <img
-              src={rank.badge}
-              alt={rank.gameTitle}
-              className="h-8 w-auto"
-            />
-            <div className="flex flex-col">
-              <span className="font-mono text-[10px] font-bold text-muted-foreground tracking-wider leading-none"
-                style={{ color: rank.color }}>
-                {rank.gameTitle}
-              </span>
-              <span className="font-mono text-[9px] text-muted-foreground/50 leading-none mt-0.5">
-                {userXP} XP
-              </span>
+          {/* Right — Rank pill */}
+          <div className="flex-1 flex justify-end">
+            <div className="hidden md:flex items-center gap-2.5">
+              <img src={rank.badge} alt={rank.gameTitle} className="h-7 w-auto" />
+              <div className="flex flex-col">
+                <span className="font-mono text-[10px] font-bold tracking-wider leading-none" style={{ color: rank.color }}>
+                  {rank.gameTitle}
+                </span>
+                <span className="font-mono text-[9px] text-muted-foreground/50 leading-none mt-0.5">
+                  {userXP} XP
+                </span>
+              </div>
             </div>
+            <button
+              className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
-
-          <button
-            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
       </header>
 
@@ -145,7 +144,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
-      <main className="w-full px-8 py-8 md:py-12 min-h-[calc(100vh-4rem)]">
+      <main className="mx-auto px-6 py-8 md:py-12 min-h-[calc(100vh-4rem)] max-w-screen-2xl w-full">
         {children}
       </main>
     </div>

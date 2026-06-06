@@ -45,7 +45,7 @@ export default function ChallengesIndex() {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto relative">
+      <div className="max-w-7xl mx-auto relative">
         {/* Radar illustration — top right ambient */}
         <div className="absolute right-[-60px] top-[-20px] pointer-events-none select-none opacity-[0.12]" style={{width:"340px"}}>
           <RadarIllustration className="w-full" />

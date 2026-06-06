@@ -49,7 +49,7 @@ export default function LearningPaths() {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto relative">
+      <div className="max-w-7xl mx-auto relative">
         {/* Network graph illustration — top right ambient */}
         <div className="absolute right-[-80px] top-[-40px] pointer-events-none select-none opacity-[0.12]" style={{width:"380px"}}>
           <NetworkGraphIllustration className="w-full" />

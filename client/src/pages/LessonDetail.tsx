@@ -129,7 +129,7 @@ export default function LessonDetail() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto pb-20">
+      <div className="max-w-6xl mx-auto pb-20">
         {/* Back */}
         <Link href={theme.backHref}>
           <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 group">

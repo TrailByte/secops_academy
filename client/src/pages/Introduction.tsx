@@ -42,7 +42,7 @@ export default function Introduction() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto pb-20">
+      <div className="max-w-6xl mx-auto pb-20">
 
         {/* ── HERO ── */}
         <section className="text-center py-8 relative">
