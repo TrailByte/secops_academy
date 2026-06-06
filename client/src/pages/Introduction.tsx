@@ -1,273 +1,212 @@
 import Layout from "@/components/Layout";
-import { useLessons } from "@/hooks/use-lessons";
-import { useChallenges } from "@/hooks/use-challenges";
-import { useProgress } from "@/hooks/use-progress";
 import { Link } from "wouter";
-import { Shield, Target, Users, BookOpen, Flag, Award, ArrowRight, Clock, Lightbulb, RotateCcw, Zap, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Shield, Target, Users, Award, ArrowRight, Flag, LayoutDashboard, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-const POINTS = {
-  lessonComplete: 100,
-  quizCorrect: 50,
-  challengeEasy: 200,
-  challengeMedium: 350,
-  challengeHard: 500,
-  hintPenalty: -50,
-};
+import { useEffect } from "react";
+import { RANKS, XP } from "@/lib/ranks";
 
 export default function Introduction() {
-  const { data: lessons } = useLessons();
-  const { data: challenges } = useChallenges();
-  const { data: progress } = useProgress();
+  useEffect(() => {
+    localStorage.setItem("seenIntro", "true");
+  }, []);
 
-  const completedLessons = (progress || []).filter(p => p.resourceType === 'lesson').length;
-  const capturedFlags = (progress || []).filter(p => p.resourceType === 'challenge').length;
-  const totalLessons = lessons?.length || 0;
-  const totalChallenges = challenges?.length || 0;
-
-  const learningOutcomes = [
-    "Identify and classify different types of malware (viruses, trojans, ransomware, rootkits) and their behavior patterns",
-    "Perform static analysis on suspicious binaries using strings extraction, PE header inspection, and YARA rules",
-    "Conduct dynamic analysis in sandboxed environments to observe runtime behavior, network callbacks, and persistence mechanisms",
-    "Recognize and bypass common anti-analysis techniques (anti-debugging, anti-VM, obfuscation)",
-    "Analyze real-world artifacts to extract Indicators of Compromise (IoCs) and write detection signatures",
+  const outcomes = [
+    "Analyze malicious artifacts using static and dynamic techniques to extract Indicators of Compromise",
+    "Understand how operating systems isolate processes and enforce security policies at the kernel level",
+    "Recognize attacker techniques, evasion strategies, and persistence mechanisms across platforms",
+    "Apply hands-on CTF methodology — decode payloads, reverse artifacts, capture flags",
+    "Progress from Tier 1 SOC Analyst fundamentals to advanced Threat Hunter capabilities",
   ];
 
-  const rules = [
-    { icon: BookOpen, title: "Training Modules", desc: "Complete lessons at your own pace. Each module covers essential concepts with embedded knowledge-check quizzes.", points: `${POINTS.lessonComplete} pts per module` },
-    { icon: Flag, title: "CTF Challenges", desc: "Analyze artifacts, decode payloads, and submit flags. Points vary by difficulty. Unlimited retries allowed.", points: "200-500 pts each" },
-    { icon: Lightbulb, title: "Hints", desc: "Each challenge includes hints you can reveal if stuck. Using a hint deducts points from that challenge.", points: `${POINTS.hintPenalty} pts per hint` },
-    { icon: Target, title: "Quizzes", desc: "Each lesson has embedded multiple-choice questions. Correct answers earn bonus points.", points: `${POINTS.quizCorrect} pts each` },
-    { icon: RotateCcw, title: "Retries", desc: "You can retry challenges as many times as needed. Only the first successful submission counts for scoring.", points: "Unlimited" },
-    { icon: Clock, title: "No Time Limit", desc: "There is no time pressure. Take as long as you need to analyze each artifact thoroughly.", points: "Self-paced" },
-  ];
-
-  const roadmap = [
-    { phase: "Phase 1", title: "Core Concepts", modules: "Modules 01-03", desc: "Foundations of malware analysis, IoC categories, and malware taxonomy. This is your prerequisite knowledge.", color: "text-green-400", bg: "bg-green-400/10", border: "border-green-400/20" },
-    { phase: "Phase 2", title: "Analysis Methods", modules: "Modules 04-05", desc: "Static and dynamic analysis methodologies. Tools, workflows, and techniques.", color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" },
-    { phase: "Phase 3", title: "Advanced Techniques", modules: "Modules 06-08", desc: "Anti-analysis evasion, process injection, and lab setup for safe analysis.", color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-400/20" },
-    { phase: "Phase 4", title: "Practical Application", modules: "Modules 09-10 + CTF", desc: "Obfuscation, C2 communication, and hands-on CTF challenges using real-world artifacts.", color: "text-amber-400", bg: "bg-amber-400/10", border: "border-amber-400/20" },
+  const paths = [
+    {
+      title: "Malware Analysis",
+      accent: "#e24b4a",
+      border: "rgba(226,75,74,0.2)",
+      bg: "rgba(226,75,74,0.06)",
+      modules: "10 modules",
+      challenges: "7 challenges",
+      desc: "Static PE analysis, dynamic sandbox behavior, process injection, C2 communication, anti-analysis evasion, and YARA rule writing.",
+    },
+    {
+      title: "Android Security",
+      accent: "#22c55e",
+      border: "rgba(34,197,94,0.2)",
+      bg: "rgba(34,197,94,0.06)",
+      modules: "4 modules",
+      challenges: "1 challenge",
+      desc: "App Sandbox (Linux UID isolation), runtime permissions, SELinux Mandatory Access Control, and a live incident scenario.",
+    },
   ];
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto pb-20">
-        <section className="text-center py-12 md:py-16 relative">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl -z-10" />
+      <div className="max-w-4xl mx-auto pb-20">
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono mb-6"
-          >
+        {/* ── HERO ── */}
+        <section className="text-center py-8 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10" />
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono mb-6">
             <Shield className="w-3.5 h-3.5" />
             CAPACITY BUILDING PROGRAM
           </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-display font-bold tracking-tight mb-6"
-            data-testid="text-intro-title"
-          >
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="text-4xl md:text-6xl font-display font-bold tracking-tight mb-6">
             SecOps Academy
           </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8"
-          >
-            An interactive <strong className="text-foreground">Capacity Building</strong> platform for malware analysis training.
-            Master the skills needed to analyze, detect, and defend against malicious software through structured lessons and hands-on CTF challenges.
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            An interactive <strong className="text-foreground">Capacity Building</strong> platform combining
+            theory modules and hands-on CTF challenges. Build defensive security skills,
+            earn ranks, and capture flags.
           </motion.p>
         </section>
 
-        <section className="mb-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-card border border-border rounded-xl p-6">
-              <div className="w-10 h-10 rounded-lg bg-blue-400/10 text-blue-400 flex items-center justify-center mb-4">
-                <Target className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Purpose</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Train security professionals and students in practical malware analysis techniques through interactive lessons and real-world CTF-style challenges.
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-6">
-              <div className="w-10 h-10 rounded-lg bg-green-400/10 text-green-400 flex items-center justify-center mb-4">
-                <Users className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Target Audience</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Cybersecurity students, junior SOC analysts, aspiring malware researchers, and IT professionals looking to build incident response capabilities.
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-6">
-              <div className="w-10 h-10 rounded-lg bg-amber-400/10 text-amber-400 flex items-center justify-center mb-4">
-                <Award className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Game Type</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">Capacity Building</strong> &mdash; focused on developing practical analytical skills through guided theory and hands-on artifact analysis challenges.
-              </p>
-            </div>
+        {/* ── PURPOSE / AUDIENCE / TYPE ── */}
+        <section className="mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              { icon: Target, color: "text-blue-400", bg: "bg-blue-400/10", title: "Purpose", desc: "Train security professionals and students in practical defensive security techniques through interactive lessons and real-world CTF-style challenges." },
+              { icon: Users, color: "text-green-400", bg: "bg-green-400/10", title: "Target Audience", desc: "Cybersecurity students, junior SOC analysts, aspiring malware researchers, and IT professionals building incident response capabilities." },
+              { icon: Award, color: "text-amber-400", bg: "bg-amber-400/10", title: "Game Type", desc: "Capacity Building — developing practical analytical skills through guided theory and hands-on artifact analysis challenges." },
+            ].map((card, i) => (
+              <motion.div key={card.title} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+                className="bg-card border border-border rounded-xl p-7">
+                <div className={`w-10 h-10 rounded-lg ${card.bg} ${card.color} flex items-center justify-center mb-4`}>
+                  <card.icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-base mb-2">{card.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{card.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </section>
 
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
-            <CheckCircle2 className="w-6 h-6 text-primary" />
+        {/* ── LEARNING OUTCOMES ── */}
+        <section className="mb-10">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-primary" />
             What You Will Achieve
           </h2>
-          <div className="space-y-4">
-            {learningOutcomes.map((outcome, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.08 }}
-                viewport={{ once: true }}
+          <div className="space-y-3">
+            {outcomes.map((outcome, idx) => (
+              <motion.div key={idx}
+                initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.06 }} viewport={{ once: true }}
                 className="flex items-start gap-4 p-4 bg-card border border-border rounded-lg"
               >
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-mono font-bold text-sm border border-primary/20">
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-mono font-bold text-xs border border-primary/20">
                   {idx + 1}
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed pt-1" data-testid={`text-outcome-${idx}`}>
-                  {outcome}
-                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed pt-0.5">{outcome}</p>
               </motion.div>
             ))}
           </div>
         </section>
 
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
-            <Zap className="w-6 h-6 text-amber-400" />
-            Learning Roadmap
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {roadmap.map((phase, idx) => (
-              <motion.div
-                key={phase.phase}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className={`p-6 rounded-xl border ${phase.border} bg-card/50`}
+        {/* ── LEARNING PATHS ── */}
+        <section className="mb-10">
+          <h2 className="text-xl font-bold mb-6">Learning Paths</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {paths.map((path, i) => (
+              <motion.div key={path.title}
+                initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08 }} viewport={{ once: true }}
+                className="bg-card rounded-xl p-7 border"
+                style={{ borderColor: path.border, background: path.bg }}
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <Badge variant="outline" className={`text-[10px] font-mono font-bold uppercase ${phase.bg} ${phase.color} ${phase.border}`}>
-                    {phase.phase}
-                  </Badge>
-                  <span className="text-xs font-mono text-muted-foreground">{phase.modules}</span>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2 h-2 rounded-full" style={{ background: path.accent }} />
+                  <h3 className="font-bold text-base" style={{ color: path.accent }}>{path.title}</h3>
                 </div>
-                <h3 className={`text-lg font-bold mb-2 ${phase.color}`}>{phase.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{phase.desc}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">{path.desc}</p>
+                <div className="flex gap-3">
+                  <span className="font-mono text-[10px] px-2 py-1 rounded border"
+                    style={{ color: path.accent, borderColor: path.border, background: "rgba(0,0,0,0.2)" }}>
+                    {path.modules}
+                  </span>
+                  <span className="font-mono text-[10px] px-2 py-1 rounded border"
+                    style={{ color: path.accent, borderColor: path.border, background: "rgba(0,0,0,0.2)" }}>
+                    {path.challenges}
+                  </span>
+                </div>
               </motion.div>
             ))}
           </div>
         </section>
 
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
-            <AlertTriangle className="w-6 h-6 text-yellow-400" />
-            Rules & Scoring
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {rules.map((rule, idx) => (
-              <motion.div
-                key={rule.title}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.06 }}
-                viewport={{ once: true }}
-                className="bg-card border border-border rounded-xl p-5"
+        {/* ── RANK SYSTEM ── */}
+        <section className="mb-10">
+          <h2 className="text-xl font-bold mb-3">Rank System</h2>
+          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+            Complete modules and capture flags to earn XP and progress through 7 ranks —
+            each corresponding to a real-world security job title.
+          </p>
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            {RANKS.map((rank, idx) => (
+              <motion.div key={rank.level}
+                initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }} viewport={{ once: true }}
+                className="bg-card border border-border rounded-xl p-4 flex flex-col items-center text-center gap-3"
               >
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                    <rule.icon className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm">{rule.title}</h4>
-                    <span className="text-[10px] font-mono text-primary">{rule.points}</span>
-                  </div>
+                <img src={rank.badge} alt={rank.gameTitle} className="h-16 w-auto" />
+                <div className="font-mono text-[10px] font-bold uppercase leading-tight" style={{ color: rank.color }}>
+                  {rank.gameTitle}
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">{rule.desc}</p>
+                <div className="text-[9px] text-muted-foreground leading-tight">
+                  {rank.realTitle}
+                </div>
               </motion.div>
             ))}
           </div>
+        </section>
 
-          <div className="mt-8 p-6 bg-primary/5 border border-primary/20 rounded-xl">
-            <h3 className="font-bold text-lg mb-4 text-primary">Scoring Summary</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-sm">
-              <div>
-                <div className="text-muted-foreground text-xs mb-1">Module Completion</div>
-                <div className="text-foreground font-bold">{POINTS.lessonComplete} pts</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground text-xs mb-1">Quiz (Correct)</div>
-                <div className="text-foreground font-bold">{POINTS.quizCorrect} pts</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground text-xs mb-1">CTF (Easy/Med/Hard)</div>
-                <div className="text-foreground font-bold">{POINTS.challengeEasy}/{POINTS.challengeMedium}/{POINTS.challengeHard}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground text-xs mb-1">Hint Penalty</div>
-                <div className="text-red-400 font-bold">{POINTS.hintPenalty} pts</div>
-              </div>
+        {/* ── SCORING ── */}
+        <section className="mb-10">
+          <h2 className="text-xl font-bold mb-6">Scoring</h2>
+          <div className="bg-card border border-border rounded-xl p-7">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 font-mono">
+              {[
+                { label: "Module Complete", val: `${XP.MODULE_COMPLETE} XP`, color: "text-primary" },
+                { label: "Quiz (1st try)", val: `${XP.QUIZ_CORRECT_FIRST_TRY} XP`, color: "text-primary" },
+                { label: "Challenge Easy / Med / Hard", val: `${XP.CHALLENGE_EASY} / ${XP.CHALLENGE_MEDIUM} / ${XP.CHALLENGE_HARD} XP`, color: "text-amber-400" },
+                { label: "Path Completion Bonus", val: `+${XP.PATH_COMPLETE_BONUS} XP`, color: "text-green-400" },
+              ].map((item) => (
+                <div key={item.label}>
+                  <div className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">{item.label}</div>
+                  <div className={`text-base font-bold ${item.color}`}>{item.val}</div>
+                </div>
+              ))}
             </div>
-            <p className="text-xs text-muted-foreground mt-4 font-mono">
-              Your score on the dashboard reflects module completions and CTF solves. Quiz bonuses and hint penalties are tracked per challenge.
+            <p className="text-xs text-muted-foreground mt-5 pt-5 border-t border-border">
+              Unlimited retries on all challenges. No time limits. Ranks scale automatically as new content is added — you never lose your rank.
             </p>
           </div>
         </section>
 
-        <section className="mb-16">
-          <div className="bg-card border border-border rounded-xl p-6">
-            <h3 className="font-bold text-lg mb-4">Your Current Progress</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-sm">
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <div className="text-muted-foreground text-xs mb-1">MODULES</div>
-                <div className="text-xl font-bold text-primary">{completedLessons}/{totalLessons}</div>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <div className="text-muted-foreground text-xs mb-1">FLAGS CAPTURED</div>
-                <div className="text-xl font-bold text-amber-500">{capturedFlags}/{totalChallenges}</div>
-              </div>
-              <div className="p-4 bg-muted/30 rounded-lg">
-                <div className="text-muted-foreground text-xs mb-1">COMPLETION</div>
-                <div className="text-xl font-bold text-green-500">
-                  {totalLessons + totalChallenges > 0
-                    ? Math.round(((completedLessons + capturedFlags) / (totalLessons + totalChallenges)) * 100)
-                    : 0}%
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+        {/* ── CTA ── */}
         <section className="text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/lessons">
-              <Button size="lg" data-testid="button-begin-training">
-                Begin Training
-                <ArrowRight className="w-4 h-4 ml-2" />
+            <Link href="/learn">
+              <Button size="lg">
+                Begin Training <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
             <Link href="/challenges">
-              <Button variant="outline" size="lg" data-testid="button-goto-challenges">
-                <Flag className="w-4 h-4 mr-2" />
-                Jump to Challenges
+              <Button variant="outline" size="lg">
+                <Flag className="w-4 h-4 mr-2" /> Jump to Challenges
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="ghost" size="lg">
+                <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
               </Button>
             </Link>
           </div>
         </section>
+
       </div>
     </Layout>
   );

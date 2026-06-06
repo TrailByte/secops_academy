@@ -86,7 +86,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <img
               src={rank.badge}
               alt={rank.gameTitle}
-              className="h-7 w-auto"
+              className="h-8 w-auto"
             />
             <div className="flex flex-col">
               <span className="font-mono text-[10px] font-bold text-muted-foreground tracking-wider leading-none"
@@ -145,7 +145,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
-      <main className="container mx-auto px-4 py-8 md:py-12 min-h-[calc(100vh-4rem)]">
+      <main className="w-full px-8 py-8 md:py-12 min-h-[calc(100vh-4rem)]">
         {children}
       </main>
     </div>

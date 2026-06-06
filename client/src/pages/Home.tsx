@@ -2,8 +2,8 @@ import Layout from "@/components/Layout";
 import { useLessons } from "@/hooks/use-lessons";
 import { useChallenges } from "@/hooks/use-challenges";
 import { useProgress } from "@/hooks/use-progress";
-import { Link } from "wouter";
-import { BookOpen, Flag, Zap, ChevronRight, ArrowRight } from "lucide-react";
+import { Link, Redirect } from "wouter";
+import { BookOpen, Flag, Zap, ChevronRight, ArrowRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { getRank, getNextRankXP, getRankProgress, calcMaxXP, XP, RANKS } from "@/lib/ranks";
 
@@ -24,6 +24,25 @@ export default function Home() {
 
   const completedLessons  = completedLessonIds.size;
   const capturedFlags     = solvedChallengeIds.size;
+
+  // ── First-time user → redirect to Introduction ──
+  const progressLoaded = progress !== undefined;
+  const hasProgress = completedLessons > 0 || capturedFlags > 0;
+  const hasSeenIntro = typeof window !== "undefined" && localStorage.getItem("seenIntro") === "true";
+
+  if (!progressLoaded) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-[50vh]">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!hasProgress && !hasSeenIntro) {
+    return <Redirect to="/introduction" />;
+  }
   const totalLessons      = lessons?.length || 0;
   const totalChallenges   = challenges?.length || 0;
   const overallPct        = totalLessons + totalChallenges > 0
@@ -63,7 +82,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
 
         {/* ── BRIEFING ── */}
         <div className="flex items-start justify-between gap-6 pb-6 mb-6 border-b border-border">
@@ -75,10 +94,10 @@ export default function Home() {
               </span>
               SYSTEM ONLINE
             </div>
-            <p className="font-mono text-[11px] text-muted-foreground/60 tracking-wide mb-2">
+            <p className="font-mono text-xs text-muted-foreground/60 tracking-wide mb-3">
               // <span className="text-muted-foreground">Train your defensive instincts. Hunt threats. Defend the perimeter.</span>
             </p>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
+            <p className="text-base text-muted-foreground leading-relaxed max-w-lg">
               An interactive training platform combining{" "}
               <span className="text-foreground font-medium">theory modules</span> and hands-on{" "}
               <span className="text-foreground font-medium">CTF challenges</span>. Build your skills, earn ranks, and capture flags.
@@ -87,7 +106,7 @@ export default function Home() {
 
           {/* New content panel */}
           {newItems.length > 0 && (
-            <div className="flex-shrink-0 w-56 bg-card border border-border rounded-xl p-4">
+            <div className="flex-shrink-0 w-80 bg-card border border-border rounded-xl p-5">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">New Content</span>
                 <span className="font-mono text-[9px] text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">
@@ -99,8 +118,8 @@ export default function Home() {
                   <div key={i} className="flex items-center gap-2.5">
                     <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: item.color }} />
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium truncate">{item.title}</div>
-                      <div className="font-mono text-[9px] text-muted-foreground/60 mt-0.5">{item.sub}</div>
+                      <div className="text-sm font-medium truncate">{item.title}</div>
+                      <div className="font-mono text-[10px] text-muted-foreground/60 mt-0.5">{item.sub}</div>
                     </div>
                     <span className="font-mono text-[8px] text-primary border border-primary/30 bg-primary/8 px-1.5 py-0.5 rounded flex-shrink-0">NEW</span>
                   </div>
@@ -111,16 +130,16 @@ export default function Home() {
         </div>
 
         {/* ── RANK ── */}
-        <div className="bg-card border border-border rounded-xl p-5 mb-4 flex items-center gap-5">
-          <img src={rank.badge} alt={rank.gameTitle} className="h-16 w-auto flex-shrink-0" />
+        <div className="bg-card border border-border rounded-xl p-7 mb-5 flex items-center gap-6">
+          <img src={rank.badge} alt={rank.gameTitle} className="h-20 w-auto flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1">Current Rank</div>
-            <div className="font-display text-xl font-bold mb-0.5" style={{ color: rank.color }}>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Current Rank</div>
+            <div className="font-display text-2xl font-bold mb-1" style={{ color: rank.color }}>
               {rank.gameTitle}
             </div>
-            <div className="text-xs text-muted-foreground mb-3">{rank.realTitle}</div>
+            <div className="text-sm text-muted-foreground mb-4">{rank.realTitle}</div>
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
                   style={{ background: rank.color }}
@@ -129,7 +148,7 @@ export default function Home() {
                   transition={{ duration: 0.8, ease: "easeOut" }}
                 />
               </div>
-              <span className="font-mono text-[10px] text-muted-foreground whitespace-nowrap">
+              <span className="font-mono text-xs text-muted-foreground whitespace-nowrap">
                 {userXP} XP {nextRank ? `→ ${nextRank.rank.gameTitle}` : "· MAX RANK"}
               </span>
             </div>
@@ -161,7 +180,7 @@ export default function Home() {
         </div>
 
         {/* ── STATS ── */}
-        <div className="grid grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-4 gap-4 mb-5">
           {[
             { label: "Modules", val: completedLessons, total: totalLessons, color: "#22c55e" },
             { label: "Flags", val: capturedFlags, total: totalChallenges, color: "#f59e0b" },
@@ -173,10 +192,10 @@ export default function Home() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="bg-card border border-border rounded-xl p-4"
+              className="bg-card border border-border rounded-xl p-5"
             >
-              <div className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground mb-2">{s.label}</div>
-              <div className="font-display text-xl font-bold" style={{ color: s.color }}>
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">{s.label}</div>
+              <div className="font-display text-2xl font-bold" style={{ color: s.color }}>
                 {s.val}{s.suffix || ""}
                 {s.total !== null && (
                   <span className="text-sm font-normal text-muted-foreground/50">/{s.total}</span>
@@ -196,16 +215,16 @@ export default function Home() {
         </div>
 
         {/* ── RESUME + CHALLENGE ── */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-5">
           {/* Resume */}
-          <div className="relative bg-card border border-border rounded-xl p-5 overflow-hidden"
+          <div className="relative bg-card border border-border rounded-xl p-6 overflow-hidden"
             style={{ borderColor: "rgba(226,75,74,0.2)" }}>
             <div className="absolute left-0 top-0 bottom-0 w-0.5 rounded-l-xl bg-[#e24b4a]" />
-            <div className="font-mono text-[9px] uppercase tracking-widest text-[#e24b4a] mb-2">↳ Resume</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-[#e24b4a] mb-3">↳ Resume</div>
             {resumeLesson ? (
               <>
-                <div className="text-sm font-semibold mb-1">{resumeLesson.title}</div>
-                <div className="text-xs text-muted-foreground mb-4">{resumeLesson.category} · {resumeLesson.difficulty}</div>
+                <div className="text-base font-semibold mb-1">{resumeLesson.title}</div>
+                <div className="text-sm text-muted-foreground mb-5">{resumeLesson.category} · {resumeLesson.difficulty}</div>
                 <Link href={`/lessons/${resumeLesson.id}`}>
                   <div className="inline-flex items-center gap-2 font-mono text-[10px] text-[#e24b4a] border border-[rgba(226,75,74,0.3)] bg-[rgba(226,75,74,0.08)] px-3 py-1.5 rounded cursor-pointer hover:bg-[rgba(226,75,74,0.15)] transition-colors">
                     CONTINUE <ArrowRight className="w-3 h-3" />
@@ -218,14 +237,14 @@ export default function Home() {
           </div>
 
           {/* Next challenge */}
-          <div className="relative bg-card border border-border rounded-xl p-5 overflow-hidden"
+          <div className="relative bg-card border border-border rounded-xl p-6 overflow-hidden"
             style={{ borderColor: "rgba(245,158,11,0.2)" }}>
             <div className="absolute left-0 top-0 bottom-0 w-0.5 rounded-l-xl bg-[#f59e0b]" />
-            <div className="font-mono text-[9px] uppercase tracking-widest text-[#f59e0b] mb-2">↳ Next Challenge</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-[#f59e0b] mb-3">↳ Next Challenge</div>
             {nextChallenge ? (
               <>
-                <div className="text-sm font-semibold mb-1">{nextChallenge.title}</div>
-                <div className="text-xs text-muted-foreground mb-3">{nextChallenge.category}</div>
+                <div className="text-base font-semibold mb-1">{nextChallenge.title}</div>
+                <div className="text-sm text-muted-foreground mb-3">{nextChallenge.category}</div>
                 <div className="mb-4">
                   <span className="font-mono text-[9px] text-[#f59e0b] border border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.08)] px-2 py-0.5 rounded uppercase">
                     {nextChallenge.difficulty}
