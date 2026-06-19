@@ -6,6 +6,7 @@ import { Link, Redirect } from "wouter";
 import { BookOpen, Flag, Zap, ChevronRight, ArrowRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { getRank, getNextRankXP, getRankProgress, calcMaxXP, XP, RANKS } from "@/lib/ranks";
+import AchievementsPanel from "@/components/AchievementsPanel";
 
 function isNew(createdAt: string | null | undefined): boolean {
   if (!createdAt) return false;
@@ -214,6 +215,10 @@ export default function Home() {
           ))}
         </div>
 
+        {/* ── ACHIEVEMENTS ── */}
+        <AchievementsPanel userXP={userXP} rankLevel={rank.level} />
+
+        
         {/* ── RESUME + CHALLENGE ── */}
         <div className="grid grid-cols-2 gap-5">
           {/* Resume */}
