@@ -70,7 +70,7 @@ export default function ChallengesList() {
         {/* Hero header */}
         <div
           className="relative overflow-hidden rounded-xl mb-10 border"
-          style={{ borderColor: `${mascot.accent}22` }}
+          style={{ borderColor: `${mascot.accent}22`, background: "#0e1220" }}
         >
           <div className="absolute right-0 bottom-0 pointer-events-none select-none">
             <img

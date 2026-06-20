@@ -41,9 +41,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-black">
-      <div className="scanline z-50 pointer-events-none fixed inset-0 opacity-[0.03]" />
-
+    <div className="relative isolate min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-black">
+      <div className="scanline pointer-events-none fixed inset-0 opacity-[0.03]" />
+      <div className="grain" />
+      <div className="vignette" />
       <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md">
         <div className="w-full px-8 h-16 flex items-center">
           {/* Left — Logo */}

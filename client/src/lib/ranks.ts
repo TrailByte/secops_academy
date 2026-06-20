@@ -7,7 +7,7 @@ export const RANKS = [
   {
     level: 0,
     gameTitle: "ROOKIE",
-    realTitle: "Tier 1 SOC Analyst",
+    realTitle: "Cybersecurity Intern",
     badge: "/images/ranks/rookie.png",
     color: "#6b7280",
     pctThreshold: 0,
@@ -15,47 +15,47 @@ export const RANKS = [
   {
     level: 1,
     gameTitle: "CYBER ANALYST",
-    realTitle: "Tier 2 SOC Analyst",
+    realTitle: "Tier 1 SOC Analyst",
     badge: "/images/ranks/cyber_analyst.png",
     color: "#22c55e",
     pctThreshold: 0.10,
   },
   {
     level: 2,
-    gameTitle: "FORENSIC INVESTIGATOR",
-    realTitle: "Tier 3 SOC Analyst",
-    badge: "/images/ranks/forensic_investigator.png",
-    color: "#20dcbe",
+    gameTitle: "INCIDENT HANDLER",
+    realTitle: "Tier 2 SOC Analyst",
+    badge: "/images/ranks/incident_handler.png",
+    color: "#106bac",
     pctThreshold: 0.20,
   },
   {
     level: 3,
-    gameTitle: "INCIDENT HANDLER",
-    realTitle: "Incident Responder",
-    badge: "/images/ranks/incident_handler.png",
-    color: "#3b82f6",
+    gameTitle: "THREAT HUNTER",
+    realTitle: "Threat Hunter",
+    badge: "/images/ranks/threat_hunter.png",
+    color: "#ad4730",
     pctThreshold: 0.35,
   },
   {
     level: 4,
-    gameTitle: "FORENSIC EXPERT",
-    realTitle: "Threat Intelligence Analyst",
-    badge: "/images/ranks/forensic_expert.png",
-    color: "#a855f7",
+    gameTitle: "FORENSIC INVESTIGATOR",
+    realTitle: "DFIR Analyst",
+    badge: "/images/ranks/forensic_investigator.png",
+    color: "#f97316",
     pctThreshold: 0.55,
   },
   {
     level: 5,
-    gameTitle: "THREAT HUNTER",
-    realTitle: "Malware Analyst",
-    badge: "/images/ranks/threat_hunter.png",
-    color: "#f97316",
+    gameTitle: "FORENSIC EXPERT",
+    realTitle: "Lead DFIR",
+    badge: "/images/ranks/forensic_expert.png",
+    color: "#a855f7",
     pctThreshold: 0.75,
   },
   {
     level: 6,
     gameTitle: "CYBER MASTER",
-    realTitle: "Threat Hunter",
+    realTitle: "Head of Cyber Defense",
     badge: "/images/ranks/cyber_master.png",
     color: "#eab308",
     pctThreshold: 1.0,
@@ -97,7 +97,7 @@ export function calcMaxXP(totalModules: number, challenges: Array<{ difficulty: 
 export function getRank(userXP: number, maxXP: number) {
   const pct = maxXP > 0 ? userXP / maxXP : 0;
   // Find highest rank threshold user has surpassed
-  let rank = RANKS[0];
+  let rank: typeof RANKS[number] = RANKS[0];
   for (const r of RANKS) {
     if (pct >= r.pctThreshold) rank = r;
   }

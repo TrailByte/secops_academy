@@ -174,19 +174,20 @@ export default function LessonsList() {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <div className="flex flex-col gap-1.5 mb-2">
                             <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
                               {lesson.category}
                             </span>
-                            <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-                            <Badge variant="outline" className={`text-[10px] font-mono uppercase ${diffClass}`}>
-                              {lesson.difficulty}
-                            </Badge>
-                            {isCompleted && (
-                              <Badge variant="outline" className={`text-[10px] font-mono uppercase ${m.badgeCompleted}`}>
-                                Completed
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Badge variant="outline" className={`text-[10px] font-mono uppercase ${diffClass}`}>
+                                {lesson.difficulty}
                               </Badge>
-                            )}
+                              {isCompleted && (
+                                <Badge variant="outline" className={`text-[10px] font-mono uppercase ${m.badgeCompleted}`}>
+                                  Completed
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                           <h3 className="text-base font-semibold transition-colors truncate group-hover:text-white">
                             {lesson.title}

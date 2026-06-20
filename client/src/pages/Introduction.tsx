@@ -114,23 +114,26 @@ export default function Introduction() {
               <motion.div key={path.title}
                 initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }} viewport={{ once: true }}
-                className="bg-card rounded-xl p-7 border"
-                style={{ borderColor: path.border, background: path.bg }}
+                className="relative overflow-hidden bg-card rounded-xl p-7 border"
+                style={{ borderColor: path.border }}
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-2 h-2 rounded-full" style={{ background: path.accent }} />
-                  <h3 className="font-bold text-base" style={{ color: path.accent }}>{path.title}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">{path.desc}</p>
-                <div className="flex gap-3">
-                  <span className="font-mono text-[10px] px-2 py-1 rounded border"
-                    style={{ color: path.accent, borderColor: path.border, background: "rgba(0,0,0,0.2)" }}>
-                    {path.modules}
-                  </span>
-                  <span className="font-mono text-[10px] px-2 py-1 rounded border"
-                    style={{ color: path.accent, borderColor: path.border, background: "rgba(0,0,0,0.2)" }}>
-                    {path.challenges}
-                  </span>
+                <div className="absolute inset-0" style={{ background: path.bg }} />
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-2 h-2 rounded-full" style={{ background: path.accent }} />
+                    <h3 className="font-bold text-base" style={{ color: path.accent }}>{path.title}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">{path.desc}</p>
+                  <div className="flex gap-3">
+                    <span className="font-mono text-[10px] px-2 py-1 rounded border"
+                      style={{ color: path.accent, borderColor: path.border, background: "rgba(0,0,0,0.2)" }}>
+                      {path.modules}
+                    </span>
+                    <span className="font-mono text-[10px] px-2 py-1 rounded border"
+                      style={{ color: path.accent, borderColor: path.border, background: "rgba(0,0,0,0.2)" }}>
+                      {path.challenges}
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             ))}
