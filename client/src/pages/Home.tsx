@@ -26,7 +26,7 @@ export default function Home() {
   const completedLessons  = completedLessonIds.size;
   const capturedFlags     = solvedChallengeIds.size;
 
-  // ── First-time user → redirect to Introduction ──
+  // -- First-time user → redirect to Introduction --
   const progressLoaded = progress !== undefined;
   const hasProgress = completedLessons > 0 || capturedFlags > 0;
   const hasSeenIntro = typeof window !== "undefined" && localStorage.getItem("seenIntro") === "true";
@@ -85,7 +85,7 @@ export default function Home() {
     <Layout>
       <div className="max-w-7xl mx-auto">
 
-        {/* ── BRIEFING ── */}
+        {/* -- BRIEFING -- */}
         <div className="flex items-start justify-between gap-6 pb-6 mb-6 border-b border-border">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-mono tracking-widest mb-3">
@@ -130,7 +130,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* ── RANK ── */}
+        {/* -- RANK -- */}
         <div className="bg-card border border-border rounded-xl p-7 mb-5 flex items-center gap-6">
           <img src={rank.badge} alt={rank.gameTitle} className="h-20 w-auto flex-shrink-0" />
           <div className="flex-1 min-w-0">
@@ -180,7 +180,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── STATS ── */}
+        {/* -- STATS -- */}
         <div className="grid grid-cols-4 gap-4 mb-5">
           {[
             { label: "Modules", val: completedLessons, total: totalLessons, color: "#22c55e" },
@@ -215,11 +215,11 @@ export default function Home() {
           ))}
         </div>
 
-        {/* ── ACHIEVEMENTS ── */}
+        {/* -- ACHIEVEMENTS -- */}
         <AchievementsPanel userXP={userXP} rankLevel={rank.level} />
 
         
-        {/* ── RESUME + CHALLENGE ── */}
+        {/* -- RESUME + CHALLENGE -- */}
         <div className="grid grid-cols-2 gap-5">
           {/* Resume */}
           <div className="relative bg-card border border-border rounded-xl p-6 overflow-hidden"
@@ -262,7 +262,7 @@ export default function Home() {
                 </Link>
               </>
             ) : (
-              <div className="text-xs text-muted-foreground">All challenges solved! 🏆</div>
+              <div className="text-xs text-muted-foreground">All challenges solved!</div>
             )}
           </div>
         </div>

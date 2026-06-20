@@ -142,7 +142,7 @@ export default function ChallengeDetail() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* ── ARTIFACT + HINTS ── */}
+          {/* -- ARTIFACT + HINTS -- */}
           <div className="lg:col-span-2 space-y-6">
             {/* Artifact */}
             <div
@@ -231,7 +231,7 @@ export default function ChallengeDetail() {
             )}
           </div>
 
-          {/* ── FLAG SUBMISSION ── */}
+          {/* -- FLAG SUBMISSION -- */}
           <div className="lg:col-span-1">
             <div
               className="sticky top-24 rounded-xl p-6"

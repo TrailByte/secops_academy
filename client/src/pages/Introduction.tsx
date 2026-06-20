@@ -44,7 +44,7 @@ export default function Introduction() {
     <Layout>
       <div className="max-w-6xl mx-auto pb-20">
 
-        {/* ── HERO ── */}
+        {/* -- HERO -- */}
         <section className="text-center py-8 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10" />
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -64,7 +64,7 @@ export default function Introduction() {
           </motion.p>
         </section>
 
-        {/* ── PURPOSE / AUDIENCE / TYPE ── */}
+        {/* -- PURPOSE / AUDIENCE / TYPE -- */}
         <section className="mb-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
@@ -84,7 +84,7 @@ export default function Introduction() {
           </div>
         </section>
 
-        {/* ── LEARNING OUTCOMES ── */}
+        {/* -- LEARNING OUTCOMES -- */}
         <section className="mb-10">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-primary" />
@@ -106,7 +106,7 @@ export default function Introduction() {
           </div>
         </section>
 
-        {/* ── LEARNING PATHS ── */}
+        {/* -- LEARNING PATHS -- */}
         <section className="mb-10">
           <h2 className="text-xl font-bold mb-6">Learning Paths</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -140,7 +140,7 @@ export default function Introduction() {
           </div>
         </section>
 
-        {/* ── RANK SYSTEM ── */}
+        {/* -- RANK SYSTEM -- */}
         <section className="mb-10">
           <h2 className="text-xl font-bold mb-3">Rank System</h2>
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
@@ -166,7 +166,7 @@ export default function Introduction() {
           </div>
         </section>
 
-        {/* ── SCORING ── */}
+        {/* -- SCORING -- */}
         <section className="mb-10">
           <h2 className="text-xl font-bold mb-6">Scoring</h2>
           <div className="bg-card border border-border rounded-xl p-7">
@@ -189,7 +189,7 @@ export default function Introduction() {
           </div>
         </section>
 
-        {/* ── CTA ── */}
+        {/* -- CTA -- */}
         <section className="text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/learn">

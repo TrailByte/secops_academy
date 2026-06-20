@@ -204,7 +204,7 @@ export default function AdminLessonForm() {
             />
           </div>
 
-          {/* ── Quiz Builder ── */}
+          {/* -- Quiz Builder -- */}
           <div className="pt-4 border-t border-border">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
