@@ -25,6 +25,10 @@ export interface IStorage {
   createLearningPath(data: { title: string; slug: string; description: string; icon: string; color: string; order: number }): Promise<LearningPath>;
   updateLearningPath(slug: string, data: Partial<{ title: string; description: string; icon: string; color: string; order: number }>): Promise<LearningPath>;
   deleteLearningPath(slug: string): Promise<void>;
+  updateLesson(id: number, data: Partial<InsertLesson>): Promise<Lesson>;
+  deleteLesson(id: number): Promise<void>;
+  updateQuiz(id: number, data: Partial<{ question: string; options: string[]; correctAnswer: number; explanation: string }>): Promise<Quiz>;
+  deleteQuiz(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -163,6 +167,24 @@ export class DatabaseStorage implements IStorage {
 
   async deleteLearningPath(slug: string): Promise<void> {
     await db.delete(learningPaths).where(eq(learningPaths.slug, slug));
+  }
+
+  async updateLesson(id: number, data: Partial<InsertLesson>): Promise<Lesson> {
+    const [updated] = await db.update(lessons).set(data).where(eq(lessons.id, id)).returning();
+    return updated;
+  }
+
+  async deleteLesson(id: number): Promise<void> {
+    await db.delete(lessons).where(eq(lessons.id, id));
+  }
+
+  async updateQuiz(id: number, data: Partial<{ question: string; options: string[]; correctAnswer: number; explanation: string }>): Promise<Quiz> {
+    const [updated] = await db.update(quizzes).set(data).where(eq(quizzes.id, id)).returning();
+    return updated;
+  }
+
+  async deleteQuiz(id: number): Promise<void> {
+    await db.delete(quizzes).where(eq(quizzes.id, id));
   }
 }
 

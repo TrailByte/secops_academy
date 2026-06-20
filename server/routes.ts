@@ -129,6 +129,98 @@ export async function registerRoutes(
     res.json(quizzes);
   });
 
+  // ─── Admin: Lessons + Quizzes CRUD ───
+  const quizInputSchema = z.object({
+    id: z.number().optional(), // present = update existing quiz, absent = create new
+    question: z.string().min(1),
+    options: z.array(z.string().min(1)).min(2),
+    correctAnswer: z.number().int().min(0),
+    explanation: z.string().optional(),
+  });
+
+  const lessonFormSchema = z.object({
+    title: z.string().min(1),
+    slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "lowercase letters, numbers, and hyphens only"),
+    content: z.string().min(1),
+    category: z.string().min(1),
+    difficulty: z.enum(["Beginner", "Intermediate", "Advanced"]),
+    order: z.number().int(),
+    learningPathSlug: z.string().optional(),
+    quizzes: z.array(quizInputSchema).default([]),
+  });
+
+  app.post(api.admin.createLesson.path, requireAdmin, async (req, res) => {
+    const parsed = lessonFormSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid lesson data", errors: parsed.error.flatten() });
+    }
+    const { quizzes: quizInputs, ...lessonData } = parsed.data;
+    const lesson = await storage.createLesson(lessonData as any);
+    for (const q of quizInputs) {
+      await storage.createQuiz({ question: q.question, options: q.options, correctAnswer: q.correctAnswer, explanation: q.explanation, lessonId: lesson.id });
+    }
+    res.json(lesson);
+  });
+
+  app.put(api.admin.updateLesson.path, requireAdmin, async (req, res) => {
+    const id = Number(req.params.id);
+    const existingLesson = await storage.getLesson(id);
+    if (!existingLesson) return res.status(404).json({ message: "Lesson not found" });
+
+    const parsed = lessonFormSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid lesson data", errors: parsed.error.flatten() });
+    }
+    const { quizzes: quizInputs, ...lessonData } = parsed.data;
+
+    try {
+      const updatedLesson = await storage.updateLesson(id, lessonData as any);
+
+      const existingQuizzes = await storage.getQuizzesByLesson(id);
+      const keepIds = new Set(quizInputs.filter((q) => q.id).map((q) => q.id));
+
+      for (const eq of existingQuizzes) {
+        if (!keepIds.has(eq.id)) {
+          await storage.deleteQuiz(eq.id);
+        }
+      }
+
+      for (const q of quizInputs) {
+        if (q.id) {
+          await storage.updateQuiz(q.id, { question: q.question, options: q.options, correctAnswer: q.correctAnswer, explanation: q.explanation });
+        } else {
+          await storage.createQuiz({ question: q.question, options: q.options, correctAnswer: q.correctAnswer, explanation: q.explanation, lessonId: id });
+        }
+      }
+
+      res.json(updatedLesson);
+    } catch (err: any) {
+      if (err.code === '23503') {
+        return res.status(409).json({ message: "Couldn't save: a question you removed has already been answered by students. Reload the page to see current answers." });
+      }
+      throw err;
+    }
+  });
+
+  app.delete(api.admin.deleteLesson.path, requireAdmin, async (req, res) => {
+    const id = Number(req.params.id);
+    const existing = await storage.getLesson(id);
+    if (!existing) return res.status(404).json({ message: "Lesson not found" });
+    try {
+      const lessonQuizzes = await storage.getQuizzesByLesson(id);
+      for (const q of lessonQuizzes) {
+        await storage.deleteQuiz(q.id);
+      }
+      await storage.deleteLesson(id);
+      res.json({ message: "Lesson deleted" });
+    } catch (err: any) {
+      if (err.code === '23503') {
+        return res.status(409).json({ message: "Cannot delete: students have already completed this lesson or answered its quizzes." });
+      }
+      throw err;
+    }
+  });
+
   app.get(api.challenges.list.path, async (req, res) => {
     const challenges = await storage.getChallenges();
     res.json(challenges);

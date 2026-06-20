@@ -189,6 +189,18 @@ export const api = {
         409: errorSchemas.validation,
       },
     },
+    createLesson: {
+      method: 'POST' as const,
+      path: '/api/admin/lessons' as const,
+    },
+    updateLesson: {
+      method: 'PUT' as const,
+      path: '/api/admin/lessons/:id' as const,
+    },
+    deleteLesson: {
+      method: 'DELETE' as const,
+      path: '/api/admin/lessons/:id' as const,
+    },
   },
 
 };

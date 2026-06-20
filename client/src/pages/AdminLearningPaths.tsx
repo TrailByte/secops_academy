@@ -61,6 +61,9 @@ export default function AdminLearningPaths() {
             <span className="text-muted-foreground hover:text-foreground cursor-pointer">Challenges</span>
           </Link>
           <span className="text-foreground font-medium">Learning Paths</span>
+          <Link href="/admin/lessons">
+            <span className="text-muted-foreground hover:text-foreground cursor-pointer">Lessons</span>
+          </Link>
         </div>
 
         <div className="flex items-center justify-between mb-8">
