@@ -77,9 +77,11 @@ export default function Home() {
   const newLessons    = (lessons    || []).filter(l => isNew((l as any).createdAt));
   const newChallenges = (challenges || []).filter(c => isNew((c as any).createdAt));
   const newItems      = [
-    ...newLessons.map(l => ({ title: l.title, sub: `Module · ${l.category}`, color: "#e24b4a", type: "module" })),
-    ...newChallenges.map(c => ({ title: c.title, sub: `Challenge · ${c.difficulty}`, color: "#f59e0b", type: "challenge" })),
-  ].slice(0, 4);
+    ...newLessons.map(l => ({ title: l.title, sub: `Module · ${l.category}`, color: "#e24b4a", type: "module", createdAt: (l as any).createdAt })),
+    ...newChallenges.map(c => ({ title: c.title, sub: `Challenge · ${c.difficulty}`, color: "#f59e0b", type: "challenge", createdAt: (c as any).createdAt })),
+  ]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 4);
 
   return (
     <Layout>
