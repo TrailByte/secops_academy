@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { lessons, quizzes, challenges, userProgress, quizAnswers, learningPaths, users, type Lesson, type Quiz, type Challenge, type InsertLesson, type Progress, type QuizAnswer, type LearningPath, type User } from "@shared/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 
 export interface IStorage {
   getLessons(): Promise<Lesson[]>;
@@ -29,6 +29,7 @@ export interface IStorage {
   deleteLesson(id: number): Promise<void>;
   updateQuiz(id: number, data: Partial<{ question: string; options: string[]; correctAnswer: number; explanation: string }>): Promise<Quiz>;
   deleteQuiz(id: number): Promise<void>;
+  deleteQuizAnswersByQuizIds(quizIds: number[]): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -185,6 +186,11 @@ export class DatabaseStorage implements IStorage {
 
   async deleteQuiz(id: number): Promise<void> {
     await db.delete(quizzes).where(eq(quizzes.id, id));
+  }
+
+  async deleteQuizAnswersByQuizIds(quizIds: number[]): Promise<void> {
+    if (quizIds.length === 0) return;
+    await db.delete(quizAnswers).where(inArray(quizAnswers.quizId, quizIds));
   }
 }
 

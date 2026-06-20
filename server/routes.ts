@@ -178,11 +178,11 @@ export async function registerRoutes(
 
       const existingQuizzes = await storage.getQuizzesByLesson(id);
       const keepIds = new Set(quizInputs.filter((q) => q.id).map((q) => q.id));
+      const removedIds = existingQuizzes.filter((eq) => !keepIds.has(eq.id)).map((eq) => eq.id);
 
-      for (const eq of existingQuizzes) {
-        if (!keepIds.has(eq.id)) {
-          await storage.deleteQuiz(eq.id);
-        }
+      await storage.deleteQuizAnswersByQuizIds(removedIds);
+      for (const id of removedIds) {
+        await storage.deleteQuiz(id);
       }
 
       for (const q of quizInputs) {
@@ -206,19 +206,18 @@ export async function registerRoutes(
     const id = Number(req.params.id);
     const existing = await storage.getLesson(id);
     if (!existing) return res.status(404).json({ message: "Lesson not found" });
-    try {
-      const lessonQuizzes = await storage.getQuizzesByLesson(id);
-      for (const q of lessonQuizzes) {
-        await storage.deleteQuiz(q.id);
-      }
-      await storage.deleteLesson(id);
-      res.json({ message: "Lesson deleted" });
-    } catch (err: any) {
-      if (err.code === '23503') {
-        return res.status(409).json({ message: "Cannot delete: students have already completed this lesson or answered its quizzes." });
-      }
-      throw err;
+
+    const lessonQuizzes = await storage.getQuizzesByLesson(id);
+    const quizIds = lessonQuizzes.map((q) => q.id);
+
+    // Students keep earned XP - userProgress is untouched. Only the
+    // per-question answer history (tied to the quizzes themselves) is removed,
+    await storage.deleteQuizAnswersByQuizIds(quizIds);
+    for (const q of lessonQuizzes) {
+      await storage.deleteQuiz(q.id);
     }
+    await storage.deleteLesson(id);
+    res.json({ message: "Lesson deleted" });
   });
 
   app.get(api.challenges.list.path, async (req, res) => {
