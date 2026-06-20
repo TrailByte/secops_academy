@@ -7,15 +7,17 @@ import { useLessons } from "@/hooks/use-lessons";
 import { useChallenges } from "@/hooks/use-challenges";
 import { getRank, calcMaxXP } from "@/lib/ranks";
 import { useAuth, useLogout } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: progress } = useProgress();
   const { data: lessons } = useLessons();
   const { data: challenges } = useChallenges();
   const { user } = useAuth();
   const logout = useLogout();
+  const { toast } = useToast();
 
   // Calculate user XP
   const completedLessons = (progress || []).filter(p => p.resourceType === "lesson").length;
@@ -107,7 +109,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <>
                   <span className="text-xs text-muted-foreground truncate max-w-[140px]">{user.email}</span>
                   <button
-                    onClick={() => logout.mutate()}
+                    onClick={() => {
+                      if (window.confirm("Sign out of your account?")) {
+                        logout.mutate(undefined, {
+                          onSuccess: () => {
+                            toast({ title: "Signed out", description: "See you next time, agent." });
+                            navigate("/introduction");
+                          },
+                        });
+                      }
+                    }}
                     className="text-muted-foreground hover:text-foreground transition-colors"
                     title="Sign out"
                   >
@@ -166,7 +177,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div className="border-t border-border mx-4 pt-3 pb-1">
               {user ? (
                 <button
-                  onClick={() => { logout.mutate(); setIsMobileMenuOpen(false); }}
+                  onClick={() => {
+                    if (window.confirm("Sign out of your account?")) {
+                      logout.mutate(undefined, {
+                        onSuccess: () => {
+                          toast({ title: "Signed out", description: "See you next time, agent." });
+                          navigate("/introduction");
+                        },
+                      });
+                      setIsMobileMenuOpen(false);
+                    }
+                  }}
                   className="flex items-center gap-2 text-sm text-muted-foreground"
                 >
                   <LogOut className="w-4 h-4" /> Sign out ({user.email})

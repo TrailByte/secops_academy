@@ -42,6 +42,7 @@ export function useLogin() {
     },
     onSuccess: (user) => {
       queryClient.setQueryData([api.auth.me.path], user);
+      queryClient.invalidateQueries();
     },
   });
 }
@@ -81,7 +82,7 @@ export function useLogout() {
     },
     onSuccess: () => {
       queryClient.setQueryData([api.auth.me.path], null);
-      queryClient.invalidateQueries({ queryKey: [api.progress.list.path] });
+      queryClient.clear();
     },
   });
 }

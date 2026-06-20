@@ -43,7 +43,11 @@ export async function registerRoutes(
   app.post(api.auth.logout.path, (req, res) => {
     req.logout((err) => {
       if (err) return res.status(500).json({ message: "Failed to log out" });
-      res.json({ message: "Logged out" });
+      req.session.destroy((err) => {
+        if (err) return res.status(500).json({ message: "Failed to clear session" });
+        res.clearCookie("connect.sid");
+        res.json({ message: "Logged out" });
+      });
     });
   });
 
