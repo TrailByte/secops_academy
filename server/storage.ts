@@ -20,6 +20,8 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserById(id: number): Promise<User | undefined>;
   createUser(data: { email: string; passwordHash: string }): Promise<User>;
+  updateChallenge(id: number, data: Partial<typeof challenges.$inferInsert>): Promise<Challenge>;
+  deleteChallenge(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -137,6 +139,14 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
   
+  async updateChallenge(id: number, data: Partial<typeof challenges.$inferInsert>): Promise<Challenge> {
+    const [updated] = await db.update(challenges).set(data).where(eq(challenges.id, id)).returning();
+    return updated;
+  }
+
+  async deleteChallenge(id: number): Promise<void> {
+    await db.delete(challenges).where(eq(challenges.id, id));
+  }
 }
 
 export const storage = new DatabaseStorage();

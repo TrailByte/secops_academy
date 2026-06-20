@@ -135,6 +135,20 @@ export const api = {
       },
     },
   },
+  admin: {
+    createChallenge: {
+      method: 'POST' as const,
+      path: '/api/admin/challenges' as const,
+    },
+    updateChallenge: {
+      method: 'PUT' as const,
+      path: '/api/admin/challenges/:id' as const,
+    },
+    deleteChallenge: {
+      method: 'DELETE' as const,
+      path: '/api/admin/challenges/:id' as const,
+    },
+  },
 
 };
 

@@ -48,6 +48,8 @@ export const challenges = pgTable("challenges", {
   hints: jsonb("hints").notNull(),
   artifact: text("artifact"),
   technicalContext: text("technical_context"),
+  fileUrl: text("file_url"),
+  fileName: text("file_name"),
   learningPathSlug: text("learning_path_slug").references(() => learningPaths.slug),
   createdAt: timestamp("created_at").defaultNow(),
 });

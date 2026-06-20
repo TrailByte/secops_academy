@@ -5,6 +5,8 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import passport from "passport";
 import { hashPassword, requireAuth, requireAdmin } from "./auth";
+import { uploadChallengeFile, deleteChallengeFileIfExists } from "./upload";
+import fs from "fs";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -112,6 +114,68 @@ export async function registerRoutes(
       message: isCorrect ? 'Flag captured! Great job.' : 'Incorrect flag. Try again.'
     });
   });
+
+
+  // ─── Admin: Challenges CRUD ───
+  const challengeFormSchema = z.object({
+    title: z.string().min(1),
+    description: z.string().min(1),
+    difficulty: z.enum(["Easy", "Medium", "Hard"]),
+    category: z.string().min(1),
+    flag: z.string().min(1),
+    hints: z.string().transform((s) => JSON.parse(s) as string[]),
+    artifact: z.string().optional(),
+    technicalContext: z.string().optional(),
+    learningPathSlug: z.string().optional(),
+  });
+
+  app.post("/api/admin/challenges", requireAdmin, uploadChallengeFile, async (req, res) => {
+    const parsed = challengeFormSchema.safeParse(req.body);
+    if (!parsed.success) {
+      if (req.file) fs.unlinkSync(req.file.path);
+      return res.status(400).json({ message: "Invalid challenge data", errors: parsed.error.flatten() });
+    }
+    const fileUrl = req.file ? `/files/challenges/${req.file.filename}` : null;
+    const fileName = req.file ? req.file.originalname : null;
+    const challenge = await storage.createChallenge({ ...parsed.data, fileUrl, fileName });
+    res.json(challenge);
+  });
+
+  app.put("/api/admin/challenges/:id", requireAdmin, uploadChallengeFile, async (req, res) => {
+    const id = Number(req.params.id);
+    const existing = await storage.getChallenge(id);
+    if (!existing) {
+      if (req.file) fs.unlinkSync(req.file.path);
+      return res.status(404).json({ message: "Challenge not found" });
+    }
+
+    const parsed = challengeFormSchema.safeParse(req.body);
+    if (!parsed.success) {
+      if (req.file) fs.unlinkSync(req.file.path);
+      return res.status(400).json({ message: "Invalid challenge data", errors: parsed.error.flatten() });
+    }
+
+    let fileUrl = existing.fileUrl;
+    let fileName = existing.fileName;
+    if (req.file) {
+      deleteChallengeFileIfExists(existing.fileUrl);
+      fileUrl = `/files/challenges/${req.file.filename}`;
+      fileName = req.file.originalname;
+    }
+
+    const updated = await storage.updateChallenge(id, { ...parsed.data, fileUrl, fileName });
+    res.json(updated);
+  });
+
+  app.delete("/api/admin/challenges/:id", requireAdmin, async (req, res) => {
+    const id = Number(req.params.id);
+    const existing = await storage.getChallenge(id);
+    if (!existing) return res.status(404).json({ message: "Challenge not found" });
+    deleteChallengeFileIfExists(existing.fileUrl);
+    await storage.deleteChallenge(id);
+    res.json({ message: "Challenge deleted" });
+  });
+
 
   app.get(api.progress.list.path, async (req, res) => {
     if (!(req.isAuthenticated && req.isAuthenticated())) {
