@@ -87,6 +87,13 @@ export default function AdminChallenges() {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-6 text-sm">
+          <span className="text-foreground font-medium">Challenges</span>
+          <Link href="/admin/learning-paths">
+            <span className="text-muted-foreground hover:text-foreground cursor-pointer">Learning Paths</span>
+          </Link>
+        </div>
+
         <div className="flex items-center justify-between mb-8">
           <div>
             <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">

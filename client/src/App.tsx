@@ -17,6 +17,8 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import AdminChallenges from "@/pages/AdminChallenges";
 import AdminChallengeForm from "@/pages/AdminChallengeForm";
+import AdminLearningPaths from "@/pages/AdminLearningPaths";
+import AdminLearningPathForm from "@/pages/AdminLearningPathForm";
 
 function Router() {
   return (
@@ -37,6 +39,9 @@ function Router() {
       <Route path="/admin/challenges/new" component={AdminChallengeForm} />
       <Route path="/admin/challenges/:id/edit" component={AdminChallengeForm} />
       <Route path="/admin/challenges" component={AdminChallenges} />
+      <Route path="/admin/learning-paths/new" component={AdminLearningPathForm} />
+      <Route path="/admin/learning-paths/:slug/edit" component={AdminLearningPathForm} />
+      <Route path="/admin/learning-paths" component={AdminLearningPaths} />
       <Route component={NotFound} />
     </Switch>
   );

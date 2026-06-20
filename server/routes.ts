@@ -73,6 +73,46 @@ export async function registerRoutes(
     res.json(path);
   });
 
+  app.post(api.admin.createLearningPath.path, requireAdmin, async (req, res) => {
+    const parsed = api.admin.createLearningPath.input.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid learning path data", errors: parsed.error.flatten() });
+    }
+    const existing = await storage.getLearningPath(parsed.data.slug);
+    if (existing) {
+      return res.status(400).json({ message: "A learning path with this slug already exists" });
+    }
+    const created = await storage.createLearningPath(parsed.data);
+    res.json(created);
+  });
+
+  app.put(api.admin.updateLearningPath.path, requireAdmin, async (req, res) => {
+    const slug = String(req.params.slug);
+    const existing = await storage.getLearningPath(slug);
+    if (!existing) return res.status(404).json({ message: "Learning path not found" });
+    const parsed = api.admin.updateLearningPath.input.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid learning path data", errors: parsed.error.flatten() });
+    }
+    const updated = await storage.updateLearningPath(slug, parsed.data);
+    res.json(updated);
+  });
+
+  app.delete(api.admin.deleteLearningPath.path, requireAdmin, async (req, res) => {
+    const slug = String(req.params.slug);
+    const existing = await storage.getLearningPath(slug);
+    if (!existing) return res.status(404).json({ message: "Learning path not found" });
+    try {
+      await storage.deleteLearningPath(slug);
+      res.json({ message: "Learning path deleted" });
+    } catch (err: any) {
+      if (err.code === '23503') {
+        return res.status(409).json({ message: "Cannot delete: lessons or challenges still reference this learning path. Reassign or remove them first." });
+      }
+      throw err;
+    }
+  });
+
   app.get(api.lessons.list.path, async (req, res) => {
     const lessons = await storage.getLessons();
     res.json(lessons);
@@ -253,7 +293,7 @@ export async function registerRoutes(
       category: "foundations",
       difficulty: "Beginner",
       order: 1,
-      content: `> **CORE CONCEPT** — This module covers prerequisite knowledge needed before attempting the CTF challenges. Make sure you understand these fundamentals before proceeding to the hands-on exercises.
+      content: `> **CORE CONCEPT** - This module covers prerequisite knowledge needed before attempting the CTF challenges. Make sure you understand these fundamentals before proceeding to the hands-on exercises.
 
 # Why Malware Analysis?
 
@@ -285,10 +325,10 @@ Think of IoCs as the **fingerprints left at a crime scene**. They allow defender
 ---
 
 ## Further Reading
-- [MITRE ATT&CK Framework](https://attack.mitre.org/) — Comprehensive knowledge base of adversary tactics and techniques
-- [NIST SP 800-83: Guide to Malware Incident Prevention](https://csrc.nist.gov/publications/detail/sp/800-83/rev-1/final) — Official NIST guidelines
-- [SANS Malware Analysis Cheat Sheet](https://www.sans.org/posters/malware-analysis-cheat-sheet/) — Quick reference poster
-- [VirusTotal](https://www.virustotal.com/) — Free online malware scanning and analysis service
+- [MITRE ATT&CK Framework](https://attack.mitre.org/) - Comprehensive knowledge base of adversary tactics and techniques
+- [NIST SP 800-83: Guide to Malware Incident Prevention](https://csrc.nist.gov/publications/detail/sp/800-83/rev-1/final) - Official NIST guidelines
+- [SANS Malware Analysis Cheat Sheet](https://www.sans.org/posters/malware-analysis-cheat-sheet/) - Quick reference poster
+- [VirusTotal](https://www.virustotal.com/) - Free online malware scanning and analysis service
 `
     });
 
@@ -302,7 +342,7 @@ Think of IoCs as the **fingerprints left at a crime scene**. They allow defender
       category: "foundations",
       difficulty: "Beginner",
       order: 2,
-      content: `> **CORE CONCEPT** — This module covers prerequisite knowledge needed before attempting the CTF challenges. Make sure you understand these fundamentals before proceeding to the hands-on exercises.
+      content: `> **CORE CONCEPT** - This module covers prerequisite knowledge needed before attempting the CTF challenges. Make sure you understand these fundamentals before proceeding to the hands-on exercises.
 
 # IoC Categories for Malware
 
@@ -347,10 +387,10 @@ Observed by running the malware.
 ---
 
 ## Further Reading
-- [MITRE ATT&CK: Indicator Types](https://attack.mitre.org/techniques/T1071/) — Network-based indicator techniques
-- [STIX/TAXII Standards (OASIS)](https://oasis-open.github.io/cti-documentation/) — Structured Threat Information Expression for sharing IoCs
-- [OpenIOC Framework](https://www.mandiant.com/resources/blog/openioc-basics) — Mandiant\u2019s open framework for sharing IoCs
-- [AlienVault OTX](https://otx.alienvault.com/) — Open Threat Exchange community platform
+- [MITRE ATT&CK: Indicator Types](https://attack.mitre.org/techniques/T1071/) - Network-based indicator techniques
+- [STIX/TAXII Standards (OASIS)](https://oasis-open.github.io/cti-documentation/) - Structured Threat Information Expression for sharing IoCs
+- [OpenIOC Framework](https://www.mandiant.com/resources/blog/openioc-basics) - Mandiant\u2019s open framework for sharing IoCs
+- [AlienVault OTX](https://otx.alienvault.com/) - Open Threat Exchange community platform
 `
     });
 
@@ -364,7 +404,7 @@ Observed by running the malware.
       category: "foundations",
       difficulty: "Beginner",
       order: 3,
-      content: `> **CORE CONCEPT** — This module covers prerequisite knowledge needed before attempting the CTF challenges. Make sure you understand these fundamentals before proceeding to the hands-on exercises.
+      content: `> **CORE CONCEPT** - This module covers prerequisite knowledge needed before attempting the CTF challenges. Make sure you understand these fundamentals before proceeding to the hands-on exercises.
 
 # Types of Malware
 
@@ -403,10 +443,10 @@ Knowing the \"species\" helps predict behavior and guides your analysis approach
 ---
 
 ## Further Reading
-- [MITRE ATT&CK Software List](https://attack.mitre.org/software/) — Catalog of known malware families and their TTPs
-- [ENISA Threat Landscape Report](https://www.enisa.europa.eu/topics/threat-risk-management/threats-and-trends) — Annual European threat landscape analysis
-- [CISA Malware Analysis Reports](https://www.cisa.gov/news-events/cybersecurity-advisories) — US government malware advisories
-- [Malpedia](https://malpedia.caad.fkie.fraunhofer.de/) — Fraunhofer FKIE malware encyclopedia
+- [MITRE ATT&CK Software List](https://attack.mitre.org/software/) - Catalog of known malware families and their TTPs
+- [ENISA Threat Landscape Report](https://www.enisa.europa.eu/topics/threat-risk-management/threats-and-trends) - Annual European threat landscape analysis
+- [CISA Malware Analysis Reports](https://www.cisa.gov/news-events/cybersecurity-advisories) - US government malware advisories
+- [Malpedia](https://malpedia.caad.fkie.fraunhofer.de/) - Fraunhofer FKIE malware encyclopedia
 `
     });
 
@@ -484,11 +524,11 @@ rule Suspicious_Backdoor {
 ---
 
 ## Further Reading
-- [Microsoft PE Format Documentation](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format) — Official PE specification
-- [YARA Documentation](https://yara.readthedocs.io/en/stable/) — Official YARA rule writing guide
-- [PE-bear (GitHub)](https://github.com/hasherezade/pe-bear) — PE file analysis tool
-- [pefile Python Library](https://github.com/erocarrera/pefile) — Python module for PE parsing
-- [VirusTotal YARA](https://docs.virustotal.com/docs/yara) — Using YARA with VirusTotal
+- [Microsoft PE Format Documentation](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format) - Official PE specification
+- [YARA Documentation](https://yara.readthedocs.io/en/stable/) - Official YARA rule writing guide
+- [PE-bear (GitHub)](https://github.com/hasherezade/pe-bear) - PE file analysis tool
+- [pefile Python Library](https://github.com/erocarrera/pefile) - Python module for PE parsing
+- [VirusTotal YARA](https://docs.virustotal.com/docs/yara) - Using YARA with VirusTotal
 `
     });
 
@@ -537,11 +577,11 @@ Dynamic analysis means **running the malware** in a controlled environment and o
 ---
 
 ## Further Reading
-- [Sysinternals Suite (Microsoft)](https://learn.microsoft.com/en-us/sysinternals/) — Process Monitor, Process Explorer, and more
-- [Wireshark Documentation](https://www.wireshark.org/docs/) — Network protocol analyzer
-- [FakeNet-NG (Mandiant)](https://github.com/mandiant/flare-fakenet-ng) — Dynamic network analysis tool
-- [Any.Run Interactive Sandbox](https://any.run/) — Interactive malware analysis sandbox
-- [MITRE ATT&CK: Execution](https://attack.mitre.org/tactics/TA0002/) — Execution techniques taxonomy
+- [Sysinternals Suite (Microsoft)](https://learn.microsoft.com/en-us/sysinternals/) - Process Monitor, Process Explorer, and more
+- [Wireshark Documentation](https://www.wireshark.org/docs/) - Network protocol analyzer
+- [FakeNet-NG (Mandiant)](https://github.com/mandiant/flare-fakenet-ng) - Dynamic network analysis tool
+- [Any.Run Interactive Sandbox](https://any.run/) - Interactive malware analysis sandbox
+- [MITRE ATT&CK: Execution](https://attack.mitre.org/tactics/TA0002/) - Execution techniques taxonomy
 `
     });
 
@@ -591,11 +631,11 @@ As an analyst, you can:
 ---
 
 ## Further Reading
-- [MITRE ATT&CK: Defense Evasion](https://attack.mitre.org/tactics/TA0005/) — Catalog of evasion techniques
-- [ScyllaHide (GitHub)](https://github.com/x64dbg/ScyllaHide) — Anti-anti-debug plugin for x64dbg
-- [al-khaser (GitHub)](https://github.com/LordNoteworthy/al-khaser) — Tool demonstrating anti-VM/debug techniques
-- [CheckPoint Research: Evasion Techniques](https://research.checkpoint.com/) — Latest evasion technique research
-- [Unprotect Project](https://unprotect.it/) — Database of malware evasion techniques
+- [MITRE ATT&CK: Defense Evasion](https://attack.mitre.org/tactics/TA0005/) - Catalog of evasion techniques
+- [ScyllaHide (GitHub)](https://github.com/x64dbg/ScyllaHide) - Anti-anti-debug plugin for x64dbg
+- [al-khaser (GitHub)](https://github.com/LordNoteworthy/al-khaser) - Tool demonstrating anti-VM/debug techniques
+- [CheckPoint Research: Evasion Techniques](https://research.checkpoint.com/) - Latest evasion technique research
+- [Unprotect Project](https://unprotect.it/) - Database of malware evasion techniques
 `
     });
 
@@ -645,9 +685,9 @@ Process injection allows malware to execute code within the address space of ano
 ---
 
 ## Further Reading
-- [MITRE ATT&CK T1055: Process Injection](https://attack.mitre.org/techniques/T1055/) — All sub-techniques of process injection
-- [Elastic Security: Ten Process Injection Techniques](https://www.elastic.co/blog/ten-process-injection-techniques-technical-survey-common-and-trending-process) — Technical survey
-- [Red Canary: Process Injection](https://redcanary.com/threat-detection-report/techniques/process-injection/) — Detection strategies
+- [MITRE ATT&CK T1055: Process Injection](https://attack.mitre.org/techniques/T1055/) - All sub-techniques of process injection
+- [Elastic Security: Ten Process Injection Techniques](https://www.elastic.co/blog/ten-process-injection-techniques-technical-survey-common-and-trending-process) - Technical survey
+- [Red Canary: Process Injection](https://redcanary.com/threat-detection-report/techniques/process-injection/) - Detection strategies
 `
     });
 
@@ -698,10 +738,10 @@ If you can't set up a local lab:
 ---
 
 ## Further Reading
-- [FLARE VM (Mandiant GitHub)](https://github.com/mandiant/flare-vm) — Windows analysis VM setup
-- [REMnux Documentation](https://docs.remnux.org/) — Linux analysis distribution
-- [MalwareBazaar](https://bazaar.abuse.ch/) — Community-driven malware sample repository
-- [SANS FOR610: Reverse Engineering Malware](https://www.sans.org/cyber-security-courses/reverse-engineering-malware-malware-analysis-tools-techniques/) — Professional training course
+- [FLARE VM (Mandiant GitHub)](https://github.com/mandiant/flare-vm) - Windows analysis VM setup
+- [REMnux Documentation](https://docs.remnux.org/) - Linux analysis distribution
+- [MalwareBazaar](https://bazaar.abuse.ch/) - Community-driven malware sample repository
+- [SANS FOR610: Reverse Engineering Malware](https://www.sans.org/cyber-security-courses/reverse-engineering-malware-malware-analysis-tools-techniques/) - Professional training course
 `
     });
 
@@ -755,10 +795,10 @@ Packers compress and/or encrypt the executable. The real code is decompressed at
 ---
 
 ## Further Reading
-- [MITRE ATT&CK T1027: Obfuscated Files](https://attack.mitre.org/techniques/T1027/) — Obfuscation techniques taxonomy
-- [UPX Official Documentation](https://upx.github.io/) — Popular PE packer
-- [Detect It Easy (GitHub)](https://github.com/horsicq/Detect-It-Easy) — Packer/compiler detection tool
-- [CyberChef (GCHQ)](https://gchq.github.io/CyberChef/) — Data transformation and decoding tool
+- [MITRE ATT&CK T1027: Obfuscated Files](https://attack.mitre.org/techniques/T1027/) - Obfuscation techniques taxonomy
+- [UPX Official Documentation](https://upx.github.io/) - Popular PE packer
+- [Detect It Easy (GitHub)](https://github.com/horsicq/Detect-It-Easy) - Packer/compiler detection tool
+- [CyberChef (GCHQ)](https://gchq.github.io/CyberChef/) - Data transformation and decoding tool
 `
     });
 
@@ -808,10 +848,10 @@ JA3 creates a hash of the TLS Client Hello parameters:
 ---
 
 ## Further Reading
-- [MITRE ATT&CK TA0011: Command and Control](https://attack.mitre.org/tactics/TA0011/) — C2 techniques taxonomy
-- [MITRE ATT&CK T1568: Dynamic Resolution (DGA)](https://attack.mitre.org/techniques/T1568/) — Domain Generation Algorithm techniques
-- [JA3 TLS Fingerprinting (Salesforce)](https://github.com/salesforce/ja3) — TLS client fingerprinting
-- [Zeek Network Monitor](https://zeek.org/) — Network security monitoring framework
+- [MITRE ATT&CK TA0011: Command and Control](https://attack.mitre.org/tactics/TA0011/) - C2 techniques taxonomy
+- [MITRE ATT&CK T1568: Dynamic Resolution (DGA)](https://attack.mitre.org/techniques/T1568/) - Domain Generation Algorithm techniques
+- [JA3 TLS Fingerprinting (Salesforce)](https://github.com/salesforce/ja3) - TLS client fingerprinting
+- [Zeek Network Monitor](https://zeek.org/) - Network security monitoring framework
 `
     });
 

@@ -148,6 +148,47 @@ export const api = {
       method: 'DELETE' as const,
       path: '/api/admin/challenges/:id' as const,
     },
+    createLearningPath: {
+      method: 'POST' as const,
+      path: '/api/admin/learning-paths' as const,
+      input: z.object({
+        title: z.string().min(1),
+        slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "lowercase letters, numbers, and hyphens only"),
+        description: z.string().min(1),
+        icon: z.string().min(1),
+        color: z.string().min(1),
+        order: z.number().int(),
+      }),
+      responses: {
+        200: z.any(),
+        400: errorSchemas.validation,
+      },
+    },
+    updateLearningPath: {
+      method: 'PUT' as const,
+      path: '/api/admin/learning-paths/:slug' as const,
+      input: z.object({
+        title: z.string().min(1),
+        description: z.string().min(1),
+        icon: z.string().min(1),
+        color: z.string().min(1),
+        order: z.number().int(),
+      }),
+      responses: {
+        200: z.any(),
+        400: errorSchemas.validation,
+        404: errorSchemas.validation,
+      },
+    },
+    deleteLearningPath: {
+      method: 'DELETE' as const,
+      path: '/api/admin/learning-paths/:slug' as const,
+      responses: {
+        200: z.object({ message: z.string() }),
+        404: errorSchemas.validation,
+        409: errorSchemas.validation,
+      },
+    },
   },
 
 };

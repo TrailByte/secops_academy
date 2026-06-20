@@ -22,6 +22,9 @@ export interface IStorage {
   createUser(data: { email: string; passwordHash: string }): Promise<User>;
   updateChallenge(id: number, data: Partial<typeof challenges.$inferInsert>): Promise<Challenge>;
   deleteChallenge(id: number): Promise<void>;
+  createLearningPath(data: { title: string; slug: string; description: string; icon: string; color: string; order: number }): Promise<LearningPath>;
+  updateLearningPath(slug: string, data: Partial<{ title: string; description: string; icon: string; color: string; order: number }>): Promise<LearningPath>;
+  deleteLearningPath(slug: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -146,6 +149,20 @@ export class DatabaseStorage implements IStorage {
 
   async deleteChallenge(id: number): Promise<void> {
     await db.delete(challenges).where(eq(challenges.id, id));
+  }
+
+  async createLearningPath(data: { title: string; slug: string; description: string; icon: string; color: string; order: number }): Promise<LearningPath> {
+    const [created] = await db.insert(learningPaths).values(data).returning();
+    return created;
+  }
+
+  async updateLearningPath(slug: string, data: Partial<{ title: string; description: string; icon: string; color: string; order: number }>): Promise<LearningPath> {
+    const [updated] = await db.update(learningPaths).set(data).where(eq(learningPaths.slug, slug)).returning();
+    return updated;
+  }
+
+  async deleteLearningPath(slug: string): Promise<void> {
+    await db.delete(learningPaths).where(eq(learningPaths.slug, slug));
   }
 }
 
