@@ -22,8 +22,8 @@ function buildFormData(data: ChallengeFormInput): FormData {
   fd.append("category", data.category);
   fd.append("flag", data.flag);
   fd.append("hints", JSON.stringify(data.hints.filter((h) => h.trim().length > 0)));
-  if (data.artifact) fd.append("artifact", data.artifact);
-  if (data.technicalContext) fd.append("technicalContext", data.technicalContext);
+  fd.append("artifact", data.artifact ?? "");
+  fd.append("technicalContext", data.technicalContext ?? "");
   if (data.learningPathSlug) fd.append("learningPathSlug", data.learningPathSlug);
   if (data.file) fd.append("file", data.file);
   return fd;

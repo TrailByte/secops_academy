@@ -3,7 +3,7 @@ import { useChallenge, useSubmitFlag } from "@/hooks/use-challenges";
 import { useProgress } from "@/hooks/use-progress";
 import { useRoute, Link } from "wouter";
 import { CodeBlock } from "@/components/CodeBlock";
-import { Loader2, ArrowLeft, Flag, CheckCircle2, Terminal, HelpCircle, Info } from "lucide-react";
+import { Loader2, ArrowLeft, Flag, CheckCircle2, Terminal, HelpCircle, Info, Paperclip, Download } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
@@ -169,7 +169,33 @@ export default function ChallengeDetail() {
                 )}
               </div>
             </div>
-
+            {/* Attached File */}
+            {challenge.fileUrl && (
+              <div
+                className="rounded-xl p-5 flex items-center justify-between gap-4"
+                style={{ background: "#0e1220", border: `1px solid ${theme.border}` }}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: theme.accentDim }}
+                  >
+                    <Paperclip className="w-5 h-5" style={{ color: theme.accent }} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">{challenge.fileName || "Attached file"}</div>
+                    <div className="text-xs text-muted-foreground">Download for offline analysis</div>
+                  </div>
+                </div>
+                  <a href={challenge.fileUrl}
+                  download={challenge.fileName || undefined}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium flex-shrink-0 transition-opacity hover:opacity-90"
+                  style={{ background: theme.accent, color: "#0b0d16" }}>
+                  <Download className="w-4 h-4" />
+                  Download
+                </a>
+              </div>
+            )}
             {/* Hints */}
             {(challenge.hints as string[])?.length > 0 && (
               <div

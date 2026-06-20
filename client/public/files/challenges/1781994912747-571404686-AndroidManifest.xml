@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.cloudnotes">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <permission
+        android:name="com.example.cloudnotes.permission.INTERNAL_SYNC"
+        android:protectionLevel="signature" />
+
+    <application
+        android:label="CloudNotes"
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false">
+
+        <!-- Launcher entry point. Must be exported to appear on the home screen. -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Internal screens, not reachable by other apps. -->
+        <activity
+            android:name=".NoteDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <!-- Handles scheduled sync triggers from the system alarm manager. -->
+        <receiver
+            android:name=".SyncSchedulerReceiver"
+            android:exported="true"
+            android:permission="com.example.cloudnotes.permission.INTERNAL_SYNC" />
+
+        <!-- Provides note data to the app's own widgets and views. -->
+        <provider
+            android:name=".NotesContentProvider"
+            android:authorities="com.example.cloudnotes.provider"
+            android:exported="false" />
+
+        <!-- Performs background backup/sync of the user's notes to cloud storage. -->
+        <service
+            android:name=".BackupSyncService"
+            android:exported="true" />
+
+    </application>
+</manifest>
