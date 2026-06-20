@@ -72,6 +72,16 @@ export const userProgress = pgTable("user_progress", {
   completedAt: timestamp("completed_at").defaultNow(),
 });
 
+// Users (single shared table for both admins and students)
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  isAdmin: boolean("is_admin").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+
 // Schemas
 export const insertLearningPathSchema = createInsertSchema(learningPaths);
 export const insertLessonSchema = createInsertSchema(lessons);
@@ -89,6 +99,7 @@ export type Challenge = typeof challenges.$inferSelect;
 export type Progress = typeof userProgress.$inferSelect;
 export type QuizAnswer = typeof quizAnswers.$inferSelect;
 export type InsertQuizAnswer = z.infer<typeof insertQuizAnswerSchema>;
+export type User = typeof users.$inferSelect;
 
 // API Types
 export type SubmitFlagRequest = { flag: string };

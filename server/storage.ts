@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { lessons, quizzes, challenges, userProgress, quizAnswers, learningPaths, type Lesson, type Quiz, type Challenge, type InsertLesson, type Progress, type QuizAnswer, type LearningPath } from "@shared/schema";
+import { lessons, quizzes, challenges, userProgress, quizAnswers, learningPaths, users, type Lesson, type Quiz, type Challenge, type InsertLesson, type Progress, type QuizAnswer, type LearningPath, type User } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
@@ -17,6 +17,9 @@ export interface IStorage {
   saveQuizAnswer(userId: string, quizId: number, lessonId: number, selectedAnswer: number, isCorrect: boolean): Promise<QuizAnswer>;
   getLearningPaths(): Promise<LearningPath[]>;
   getLearningPath(slug: string): Promise<LearningPath | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserById(id: number): Promise<User | undefined>;
+  createUser(data: { email: string; passwordHash: string }): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -118,6 +121,22 @@ export class DatabaseStorage implements IStorage {
     }).returning();
     return newAnswer;
   }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async getUserById(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async createUser(data: { email: string; passwordHash: string }): Promise<User> {
+    const [user] = await db.insert(users).values(data).returning();
+    return user;
+  }
+  
 }
 
 export const storage = new DatabaseStorage();
