@@ -13,6 +13,8 @@ import LessonDetail from "@/pages/LessonDetail";
 import ChallengesList from "@/pages/ChallengesList";
 import ChallengeDetail from "@/pages/ChallengeDetail";
 import ChallengesIndex from "@/pages/ChallengesIndex";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 
 function Router() {
   return (
@@ -28,6 +30,8 @@ function Router() {
       <Route path="/challenges" component={ChallengesIndex} />
       <Route path="/challenges/path/:pathSlug" component={ChallengesList} />
       <Route path="/challenges/:id" component={ChallengeDetail} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route component={NotFound} />
     </Switch>
   );

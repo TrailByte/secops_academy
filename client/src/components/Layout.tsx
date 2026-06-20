@@ -1,11 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { Shield, BookOpen, Flag, Menu, X, Info } from "lucide-react";
+import { Shield, BookOpen, Flag, Menu, X, Info, LogOut } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProgress } from "@/hooks/use-progress";
 import { useLessons } from "@/hooks/use-lessons";
 import { useChallenges } from "@/hooks/use-challenges";
 import { getRank, calcMaxXP } from "@/lib/ranks";
+import { useAuth, useLogout } from "@/hooks/use-auth";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -13,6 +14,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { data: progress } = useProgress();
   const { data: lessons } = useLessons();
   const { data: challenges } = useChallenges();
+  const { user } = useAuth();
+  const logout = useLogout();
 
   // Calculate user XP
   const completedLessons = (progress || []).filter(p => p.resourceType === "lesson").length;
@@ -85,8 +88,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          {/* Right — Rank pill */}
-          <div className="flex-1 flex justify-end">
+          {/* Right — Rank pill + Auth */}
+          <div className="flex-1 flex items-center justify-end gap-4">
             <div className="hidden md:flex items-center gap-2.5">
               <img src={rank.badge} alt={rank.gameTitle} className="h-7 w-auto" />
               <div className="flex flex-col">
@@ -97,6 +100,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   {userXP} XP
                 </span>
               </div>
+            </div>
+            <div className="hidden md:block w-px h-5 bg-border" />
+            <div className="hidden md:flex items-center gap-2">
+              {user ? (
+                <>
+                  <span className="text-xs text-muted-foreground truncate max-w-[140px]">{user.email}</span>
+                  <button
+                    onClick={() => logout.mutate()}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    title="Sign out"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </>
+              ) : (
+                <Link href="/login">
+                  <span className="text-xs font-medium text-primary hover:underline cursor-pointer">Sign in</span>
+                </Link>
+              )}
             </div>
             <button
               className="md:hidden p-2 text-muted-foreground hover:text-foreground"
@@ -141,6 +163,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 );
               })}
             </nav>
+            <div className="border-t border-border mx-4 pt-3 pb-1">
+              {user ? (
+                <button
+                  onClick={() => { logout.mutate(); setIsMobileMenuOpen(false); }}
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
+                >
+                  <LogOut className="w-4 h-4" /> Sign out ({user.email})
+                </button>
+              ) : (
+                <Link href="/login">
+                  <span onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-medium text-primary cursor-pointer">
+                    Sign in
+                  </span>
+                </Link>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

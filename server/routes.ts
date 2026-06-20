@@ -3,11 +3,58 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
+import passport from "passport";
+import { hashPassword, requireAuth, requireAdmin } from "./auth";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  app.post(api.auth.register.path, async (req, res) => {
+    const parsed = api.auth.register.input.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid email or password (min 8 characters)" });
+    }
+    const { email, password } = parsed.data;
+    const existing = await storage.getUserByEmail(email);
+    if (existing) {
+      return res.status(400).json({ message: "An account with this email already exists" });
+    }
+    const passwordHash = await hashPassword(password);
+    const user = await storage.createUser({ email, passwordHash });
+    req.login({ id: user.id, email: user.email, isAdmin: user.isAdmin }, (err) => {
+      if (err) return res.status(500).json({ message: "Registered, but failed to log in automatically" });
+      res.json({ id: user.id, email: user.email, isAdmin: user.isAdmin });
+    });
+  });
+
+  app.post(api.auth.login.path, (req, res, next) => {
+    passport.authenticate("local", (err: any, user: any, info: any) => {
+      if (err) return next(err);
+      if (!user) return res.status(401).json({ message: info?.message || "Invalid email or password" });
+      req.login(user, (err) => {
+        if (err) return next(err);
+        res.json({ id: user.id, email: user.email, isAdmin: user.isAdmin });
+      });
+    })(req, res, next);
+  });
+
+  app.post(api.auth.logout.path, (req, res) => {
+    req.logout((err) => {
+      if (err) return res.status(500).json({ message: "Failed to log out" });
+      res.json({ message: "Logged out" });
+    });
+  });
+
+  app.get(api.auth.me.path, (req, res) => {
+    if (req.isAuthenticated && req.isAuthenticated()) {
+      const u = req.user!;
+      res.json({ id: u.id, email: u.email, isAdmin: u.isAdmin });
+    } else {
+      res.json(null);
+    }
+  });
 
   app.get("/api/learning-paths", async (req, res) => {
     const paths = await storage.getLearningPaths();
@@ -53,8 +100,8 @@ export async function registerRoutes(
     const { flag } = req.body;
     if (!flag || typeof flag !== 'string') return res.status(400).json({ message: 'Flag is required' });
     const isCorrect = flag.trim().toLowerCase() === challenge.flag.toLowerCase();
-    if (isCorrect) {
-      await storage.updateProgress('anonymous-user', 'challenge', challenge.id);
+    if (isCorrect && req.isAuthenticated && req.isAuthenticated()) {
+      await storage.updateProgress(String(req.user!.id), 'challenge', challenge.id);
     }
     res.json({
       correct: isCorrect,
@@ -63,7 +110,10 @@ export async function registerRoutes(
   });
 
   app.get(api.progress.list.path, async (req, res) => {
-    const progress = await storage.getProgress('anonymous-user');
+    if (!(req.isAuthenticated && req.isAuthenticated())) {
+      return res.json([]);
+    }
+    const progress = await storage.getProgress(String(req.user!.id));
     res.json(progress);
   });
 
@@ -75,13 +125,19 @@ export async function registerRoutes(
     if (!resourceId || typeof resourceId !== 'number') {
       return res.status(400).json({ message: 'resourceId must be a number' });
     }
-    const update = await storage.updateProgress('anonymous-user', resourceType, resourceId);
+    if (!(req.isAuthenticated && req.isAuthenticated())) {
+      return res.json({ id: -1, userId: 'guest', resourceType, resourceId, completedAt: new Date().toISOString() });
+    }
+    const update = await storage.updateProgress(String(req.user!.id), resourceType, resourceId);
     res.json(update);
   });
 
   app.get(api.quizAnswers.getByLesson.path, async (req, res) => {
+    if (!(req.isAuthenticated && req.isAuthenticated())) {
+      return res.json([]);
+    }
     const lessonId = Number(req.params.id);
-    const answers = await storage.getQuizAnswers('anonymous-user', lessonId);
+    const answers = await storage.getQuizAnswers(String(req.user!.id), lessonId);
     res.json(answers);
   });
 
@@ -92,15 +148,25 @@ export async function registerRoutes(
       return res.status(400).json({ message: 'quizId, selectedAnswer, and isCorrect are required' });
     }
 
-    const answer = await storage.saveQuizAnswer('anonymous-user', quizId, lessonId, selectedAnswer, isCorrect);
+    if (!(req.isAuthenticated && req.isAuthenticated())) {
+      // Guest: accept the answer for instant feedback, but don't persist it.
+      return res.json({
+        answer: { id: -1, userId: 'guest', quizId, lessonId, selectedAnswer, isCorrect, answeredAt: new Date().toISOString() },
+        allAnswered: false,
+        lessonCompleted: false,
+      });
+    }
+
+    const userId = String(req.user!.id);
+    const answer = await storage.saveQuizAnswer(userId, quizId, lessonId, selectedAnswer, isCorrect);
 
     const allQuizzes = await storage.getQuizzesByLesson(lessonId);
-    const allAnswers = await storage.getQuizAnswers('anonymous-user', lessonId);
+    const allAnswers = await storage.getQuizAnswers(userId, lessonId);
     const allAnswered = allQuizzes.length > 0 && allAnswers.length >= allQuizzes.length;
 
     let lessonCompleted = false;
     if (allAnswered) {
-      await storage.updateProgress('anonymous-user', 'lesson', lessonId);
+      await storage.updateProgress(userId, 'lesson', lessonId);
       lessonCompleted = true;
     }
 

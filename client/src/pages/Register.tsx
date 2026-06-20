@@ -27,7 +27,11 @@ export default function Register() {
     }
     register.mutate(
       { email, password },
-      { onSuccess: () => navigate("/") }
+      { onSuccess: () => {
+          localStorage.removeItem("seenIntro");
+          navigate("/");
+        }
+      }
     );
   };
 

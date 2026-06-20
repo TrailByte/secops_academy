@@ -101,6 +101,41 @@ export const api = {
       },
     },
   },
+  auth: {
+    register: {
+      method: 'POST' as const,
+      path: '/api/auth/register' as const,
+      input: z.object({ email: z.string().email(), password: z.string().min(8) }),
+      responses: {
+        200: z.object({ id: z.number(), email: z.string(), isAdmin: z.boolean() }),
+        400: errorSchemas.validation,
+      },
+    },
+    login: {
+      method: 'POST' as const,
+      path: '/api/auth/login' as const,
+      input: z.object({ email: z.string().email(), password: z.string() }),
+      responses: {
+        200: z.object({ id: z.number(), email: z.string(), isAdmin: z.boolean() }),
+        401: errorSchemas.validation,
+      },
+    },
+    logout: {
+      method: 'POST' as const,
+      path: '/api/auth/logout' as const,
+      responses: {
+        200: z.object({ message: z.string() }),
+      },
+    },
+    me: {
+      method: 'GET' as const,
+      path: '/api/auth/me' as const,
+      responses: {
+        200: z.object({ id: z.number(), email: z.string(), isAdmin: z.boolean() }).nullable(),
+      },
+    },
+  },
+
 };
 
 // Required helper
