@@ -15,6 +15,8 @@ import ChallengeDetail from "@/pages/ChallengeDetail";
 import ChallengesIndex from "@/pages/ChallengesIndex";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import AdminChallenges from "@/pages/AdminChallenges";
+import AdminChallengeForm from "@/pages/AdminChallengeForm";
 
 function Router() {
   return (
@@ -32,6 +34,9 @@ function Router() {
       <Route path="/challenges/:id" component={ChallengeDetail} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/admin/challenges/new" component={AdminChallengeForm} />
+      <Route path="/admin/challenges/:id/edit" component={AdminChallengeForm} />
+      <Route path="/admin/challenges" component={AdminChallenges} />
       <Route component={NotFound} />
     </Switch>
   );

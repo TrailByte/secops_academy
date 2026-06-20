@@ -107,6 +107,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div className="hidden md:flex items-center gap-2">
               {user ? (
                 <>
+                  {user.isAdmin && (
+                    <Link href="/admin/challenges">
+                      <span className="text-xs font-medium text-amber-400 hover:underline cursor-pointer mr-1">Admin</span>
+                    </Link>
+                  )}
                   <span className="text-xs text-muted-foreground truncate max-w-[140px]">{user.email}</span>
                   <button
                     onClick={() => {
