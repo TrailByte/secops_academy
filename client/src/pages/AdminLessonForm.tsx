@@ -184,7 +184,7 @@ export default function AdminLessonForm() {
           <div>
             <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1.5 block">Learning Path</label>
             <select value={learningPathSlug} onChange={(e) => setLearningPathSlug(e.target.value)} className={inputClass}>
-              <option value="">— None —</option>
+              <option value="">- None -</option>
               {learningPaths?.map((p) => (
                 <option key={p.slug} value={p.slug}>{p.title}</option>
               ))}

@@ -82,7 +82,7 @@ export default function Login() {
           <Link href="/">
             <span className="hover:text-foreground cursor-pointer underline">continue as guest</span>
           </Link>
-          {" "}— progress won't be saved.
+          {" "}- progress won't be saved.
         </p>
       </div>
     </Layout>

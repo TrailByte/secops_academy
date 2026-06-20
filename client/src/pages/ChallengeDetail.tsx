@@ -201,7 +201,7 @@ export default function ChallengeDetail() {
               </div>
             )}
 
-            {/* Technical deep dive — unlocked after solving */}
+            {/* Technical deep dive - unlocked after solving */}
             {isSolved && challenge.technicalContext && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}

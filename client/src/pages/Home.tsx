@@ -67,10 +67,10 @@ export default function Home() {
   const nextRank    = getNextRankXP(userXP, maxXP);
   const rankProg    = getRankProgress(userXP, maxXP);
 
-  // Resume — last incomplete lesson
+  // Resume - last incomplete lesson
   const resumeLesson = (lessons || []).find(l => !completedLessonIds.has(l.id));
 
-  // Next challenge — first unsolved
+  // Next challenge - first unsolved
   const nextChallenge = (challenges || []).find(c => !solvedChallengeIds.has(c.id));
 
   // New content (< 30 days)

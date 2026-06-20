@@ -121,7 +121,7 @@ export default function AdminLearningPathForm() {
 
           <div>
             <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1.5 block">
-              Slug {isEdit && <span className="normal-case text-muted-foreground/60">(locked — lessons & challenges reference this)</span>}
+              Slug {isEdit && <span className="normal-case text-muted-foreground/60">(locked - lessons & challenges reference this)</span>}
             </label>
             <Input
               value={slug}
@@ -174,7 +174,7 @@ export default function AdminLearningPathForm() {
 
           <div>
             <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1.5 block">
-              Color <span className="normal-case text-muted-foreground/60">(theme key — not yet wired to page visuals, reserved for future use)</span>
+              Color <span className="normal-case text-muted-foreground/60">(theme key - not yet wired to page visuals, reserved for future use)</span>
             </label>
             <Input value={color} onChange={(e) => setColor(e.target.value)} required placeholder="e.g. blue" />
           </div>

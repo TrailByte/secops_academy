@@ -15,7 +15,7 @@ export default function Introduction() {
     "Analyze malicious artifacts using static and dynamic techniques to extract Indicators of Compromise",
     "Understand how operating systems isolate processes and enforce security policies at the kernel level",
     "Recognize attacker techniques, evasion strategies, and persistence mechanisms across platforms",
-    "Apply hands-on CTF methodology — decode payloads, reverse artifacts, capture flags",
+    "Apply hands-on CTF methodology - decode payloads, reverse artifacts, capture flags",
     "Progress from Tier 1 SOC Analyst fundamentals to advanced Threat Hunter capabilities",
   ];
 
@@ -70,7 +70,7 @@ export default function Introduction() {
             {[
               { icon: Target, color: "text-blue-400", bg: "bg-blue-400/10", title: "Purpose", desc: "Train security professionals and students in practical defensive security techniques through interactive lessons and real-world CTF-style challenges." },
               { icon: Users, color: "text-green-400", bg: "bg-green-400/10", title: "Target Audience", desc: "Cybersecurity students, junior SOC analysts, aspiring malware researchers, and IT professionals building incident response capabilities." },
-              { icon: Award, color: "text-amber-400", bg: "bg-amber-400/10", title: "Game Type", desc: "Capacity Building — developing practical analytical skills through guided theory and hands-on artifact analysis challenges." },
+              { icon: Award, color: "text-amber-400", bg: "bg-amber-400/10", title: "Game Type", desc: "Capacity Building - developing practical analytical skills through guided theory and hands-on artifact analysis challenges." },
             ].map((card, i) => (
               <motion.div key={card.title} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                 className="bg-card border border-border rounded-xl p-7">
@@ -144,7 +144,7 @@ export default function Introduction() {
         <section className="mb-10">
           <h2 className="text-xl font-bold mb-3">Rank System</h2>
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            Complete modules and capture flags to earn XP and progress through 7 ranks —
+            Complete modules and capture flags to earn XP and progress through 7 ranks -
             each corresponding to a real-world security job title.
           </p>
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
@@ -184,7 +184,7 @@ export default function Introduction() {
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-5 pt-5 border-t border-border">
-              Unlimited retries on all challenges. No time limits. Ranks scale automatically as new content is added — you never lose your rank.
+              Unlimited retries on all challenges. No time limits. Ranks scale automatically as new content is added - you never lose your rank.
             </p>
           </div>
         </section>

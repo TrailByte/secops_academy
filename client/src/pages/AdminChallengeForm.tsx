@@ -183,7 +183,7 @@ export default function AdminChallengeForm() {
               onChange={(e) => setLearningPathSlug(e.target.value)}
               className={inputClass}
             >
-              <option value="">— None —</option>
+              <option value="">- None -</option>
               {learningPaths?.map((p) => (
                 <option key={p.slug} value={p.slug}>{p.title}</option>
               ))}
@@ -228,7 +228,7 @@ export default function AdminChallengeForm() {
 
           <div>
             <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1.5 block">
-              Artifact <span className="normal-case text-muted-foreground/60">(text shown to students — logs, code, dumps, etc.)</span>
+              Artifact <span className="normal-case text-muted-foreground/60">(text shown to students - logs, code, dumps, etc.)</span>
             </label>
             <textarea
               value={artifact}
@@ -252,7 +252,7 @@ export default function AdminChallengeForm() {
 
           <div>
             <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1.5 block">
-              Attached File <span className="normal-case text-muted-foreground/60">(optional — for offline analysis)</span>
+              Attached File <span className="normal-case text-muted-foreground/60">(optional - for offline analysis)</span>
             </label>
             {existing?.fileName && !file && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2 bg-muted/30 border border-border rounded-md px-3 py-2">
