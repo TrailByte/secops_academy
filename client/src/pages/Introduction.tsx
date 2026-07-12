@@ -4,6 +4,7 @@ import { Shield, Target, Users, Award, ArrowRight, Flag, LayoutDashboard, CheckC
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { RANKS, XP } from "@/lib/ranks";
 
 export default function Introduction() {
@@ -19,23 +20,33 @@ export default function Introduction() {
     "Progress from Tier 1 SOC Analyst fundamentals to advanced Threat Hunter capabilities",
   ];
 
+const { data: lessons } = useQuery({
+    queryKey: ["/api/lessons"],
+    queryFn: async () => { const r = await fetch("/api/lessons"); return r.json() as Promise<Array<{ learningPathSlug: string | null }>>; },
+  });
+  const { data: challenges } = useQuery({
+    queryKey: ["/api/challenges"],
+    queryFn: async () => { const r = await fetch("/api/challenges"); return r.json() as Promise<Array<{ learningPathSlug: string | null }>>; },
+  });
+
+  const countFor = (slug: string, arr?: Array<{ learningPathSlug: string | null }>) =>
+    (arr || []).filter((x) => x.learningPathSlug === slug).length;
+
   const paths = [
     {
       title: "Malware Analysis",
+      slug: "malware-analysis",
       accent: "#e24b4a",
       border: "rgba(226,75,74,0.2)",
       bg: "rgba(226,75,74,0.06)",
-      modules: "10 modules",
-      challenges: "7 challenges",
       desc: "Static PE analysis, dynamic sandbox behavior, process injection, C2 communication, anti-analysis evasion, and YARA rule writing.",
     },
     {
       title: "Android Security",
+      slug: "android-security",
       accent: "#22c55e",
       border: "rgba(34,197,94,0.2)",
       bg: "rgba(34,197,94,0.06)",
-      modules: "4 modules",
-      challenges: "1 challenge",
       desc: "App Sandbox (Linux UID isolation), runtime permissions, SELinux Mandatory Access Control, and a live incident scenario.",
     },
   ];
@@ -127,11 +138,11 @@ export default function Introduction() {
                   <div className="flex gap-3">
                     <span className="font-mono text-[10px] px-2 py-1 rounded border"
                       style={{ color: path.accent, borderColor: path.border, background: "rgba(0,0,0,0.2)" }}>
-                      {path.modules}
+                      {countFor(path.slug, lessons)} {countFor(path.slug, lessons) === 1 ? "module" : "modules"}
                     </span>
                     <span className="font-mono text-[10px] px-2 py-1 rounded border"
                       style={{ color: path.accent, borderColor: path.border, background: "rgba(0,0,0,0.2)" }}>
-                      {path.challenges}
+                      {countFor(path.slug, challenges)} {countFor(path.slug, challenges) === 1 ? "challenge" : "challenges"}
                     </span>
                   </div>
                 </div>

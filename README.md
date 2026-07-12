@@ -35,14 +35,19 @@ SecOps Academy is a modern web application designed to provide training for secu
 <div align="center">
 
 ### Dashboard Overview
-<img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/dashboard.jpg" alt="Dashboard" width="800"/>
+<img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/introduction.png" alt="Dashboard" width="800"/>
+
+*Introductory Page*
+
+### Learning Paths
+<img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/LearningPaths.png" alt="Learning Paths" width="800"/>
+
+*Curriculum from beginner to advanced users*
+
+### Gamification System
+<img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/dashboard.png" alt="Training Modules" width="800"/>
 
 *Track your progress with real-time statistics and quick access to training modules*
-
-### Training Modules
-<img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/training-modules.jpg" alt="Training Modules" width="800"/>
-
-*Curriculum from beginner to advanced malware analysis techniques*
 
 </div>
 
