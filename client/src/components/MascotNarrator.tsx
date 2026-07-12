@@ -1,25 +1,49 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Play, Pause, Square } from "lucide-react";
+import { Play, Pause, Square, Loader2, Volume2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { stripMarkdownForSpeech } from "@/lib/textToSpeech";
 
-const MASCOTS: Record<string, { idle: string; speaking: string; paused: string; done: string }> = {
-  "malware-analysis": {
-    idle:     "/images/mascots/quarantine_blob_neutral.png",
-    speaking: "/images/mascots/quarantine_blob_glitchy.png",
-    paused:   "/images/mascots/quarantine_blob_smug.png",
-    done:     "/images/mascots/quarantine_blob_corrupted_laugh.png",
-  },
+// All 8 expressions per mascot, in a storytelling sequence
+const NARRATING_SEQUENCES: Record<string, string[]> = {
+  "android-security": [
+    "focused", "curious", "thinking", "happy",
+    "surprised", "neutral", "warning", "curious",
+  ],
+  "malware-analysis": [
+    "glitchy", "smug", "surprised", "warning",
+    "angry", "neutral", "corrupted_laugh", "smug",
+  ],
+};
+
+// Static expression for non-narrating states
+const STATE_EXPRESSIONS: Record<string, Record<string, string>> = {
   "android-security": {
-    idle:     "/images/mascots/droidghost_neutral.png",
-    speaking: "/images/mascots/droidghost_focused.png",
-    paused:   "/images/mascots/droidghost_thinking.png",
-    done:     "/images/mascots/droidghost_happy.png",
+    idle:    "neutral",
+    loading: "neutral",
+    paused:  "thinking",
+    done:    "happy",
+    error:   "neutral",
+  },
+  "malware-analysis": {
+    idle:    "neutral",
+    loading: "dormant_idle",
+    paused:  "smug",
+    done:    "corrupted_laugh",
+    error:   "neutral",
   },
 };
 
-const DEFAULT_MASCOT = MASCOTS["malware-analysis"];
+const MASCOT_PREFIX: Record<string, string> = {
+  "android-security": "droidghost",
+  "malware-analysis": "quarantine_blob",
+};
 
-type State = "idle" | "speaking" | "paused" | "done" | "unsupported";
+const DEFAULT_PATH = "android-security";
+
+// Vary timing between expressions so it feels natural, not robotic
+const EXPR_TIMINGS = [3200, 4100, 3600, 5000, 3000, 4400, 3800, 4700];
+
+type State = "idle" | "loading" | "speaking" | "paused" | "done" | "error";
 
 interface MascotNarratorProps {
   content: string;
@@ -29,22 +53,6 @@ interface MascotNarratorProps {
   border: string;
 }
 
-function getVoices(): Promise<SpeechSynthesisVoice[]> {
-  return new Promise((resolve) => {
-    const immediate = window.speechSynthesis.getVoices();
-    if (immediate.length > 0) { resolve(immediate); return; }
-    const onChanged = () => {
-      const v = window.speechSynthesis.getVoices();
-      if (v.length > 0) {
-        window.speechSynthesis.removeEventListener("voiceschanged", onChanged);
-        resolve(v);
-      }
-    };
-    window.speechSynthesis.addEventListener("voiceschanged", onChanged);
-    setTimeout(() => resolve(window.speechSynthesis.getVoices()), 2000);
-  });
-}
-
 export default function MascotNarrator({
   content,
   learningPathSlug,
@@ -52,150 +60,233 @@ export default function MascotNarrator({
   accentDim,
   border,
 }: MascotNarratorProps) {
-  const mascot = (learningPathSlug && MASCOTS[learningPathSlug]) ?? DEFAULT_MASCOT;
-  const [state, setState] = useState<State>(
-    typeof window !== "undefined" && "speechSynthesis" in window ? "idle" : "unsupported"
-  );
-  const uttRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const path    = (learningPathSlug && NARRATING_SEQUENCES[learningPathSlug])
+    ? learningPathSlug
+    : DEFAULT_PATH;
+  const prefix  = MASCOT_PREFIX[path];
+  const seq     = NARRATING_SEQUENCES[path];
+  const stateEx = STATE_EXPRESSIONS[path];
 
-  const stop = useCallback(() => {
-    window.speechSynthesis.cancel();
-    uttRef.current = null;
-    setState("idle");
+  const [state,   setState]   = useState<State>("idle");
+  const [exprIdx, setExprIdx] = useState(0);
+  const audioRef    = useRef<HTMLAudioElement | null>(null);
+  const blobUrlRef  = useRef<string | null>(null);
+  const exprTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Expression cycling ────────────────────────────────────────────────────
+  const stopExprCycle = useCallback(() => {
+    if (exprTimer.current) { clearTimeout(exprTimer.current); exprTimer.current = null; }
   }, []);
 
-  // Cleanup on unmount or content change
-  useEffect(() => () => { window.speechSynthesis.cancel(); }, []);
-  useEffect(() => { window.speechSynthesis.cancel(); setState("idle"); }, [content]);
+  const scheduleNextExpr = useCallback((idx: number) => {
+    const delay = EXPR_TIMINGS[idx % EXPR_TIMINGS.length];
+    exprTimer.current = setTimeout(() => {
+      const next = (idx + 1) % seq.length;
+      setExprIdx(next);
+      scheduleNextExpr(next);
+    }, delay);
+  }, [seq.length]);
 
+  const startExprCycle = useCallback(() => {
+    stopExprCycle();
+    setExprIdx(0);
+    scheduleNextExpr(0);
+  }, [stopExprCycle, scheduleNextExpr]);
+
+  // ── Audio cleanup ─────────────────────────────────────────────────────────
+  const cleanup = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+    stopExprCycle();
+  }, [stopExprCycle]);
+
+  useEffect(() => { cleanup(); setState("idle"); }, [content, cleanup]);
+ useEffect(() => {
+  return () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+    if (exprTimer.current) {
+      clearTimeout(exprTimer.current);
+      exprTimer.current = null;
+    }
+  };
+}, []);
+
+  // ── Play ──────────────────────────────────────────────────────────────────
   const handlePlay = useCallback(async () => {
-    if (state === "paused" && uttRef.current) {
-      window.speechSynthesis.resume();
-      setState("speaking");
+    if (state === "paused" && audioRef.current) {
+      audioRef.current.play();
+      startExprCycle();
       return;
     }
+    cleanup();
+    setState("loading");
+    try {
+      const plain = stripMarkdownForSpeech(content);
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text: plain, learningPathSlug: path }),
+      });
+      if (!res.ok) { setState("error"); return; }
 
-    // Fresh start
-    window.speechSynthesis.cancel();
-    await new Promise((r) => setTimeout(r, 150)); // Firefox needs a moment after cancel
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      blobUrlRef.current = url;
 
-    const voices = await getVoices();
+      const audio = new Audio(url);
+      audioRef.current  = audio;
 
-    const plain = stripMarkdownForSpeech(content);
-    if (!plain) return;
+      audio.onplay    = () => { setState("speaking"); startExprCycle(); };
+      audio.onpause   = () => { setState((s) => s === "done" ? "done" : "paused"); stopExprCycle(); };
+      audio.onended   = () => { setState("done"); stopExprCycle(); };
+      audio.onerror   = () => { setState("error"); stopExprCycle(); };
 
-    const utt = new SpeechSynthesisUtterance(plain);
-    utt.rate   = 0.92;
-    utt.pitch  = 1;
-    utt.volume = 1;
-
-    // Pick the best English voice available
-    const preferred =
-      voices.find((v) => v.lang === "en-US" && !v.localService === false) ??
-      voices.find((v) => v.lang === "en-US") ??
-      voices.find((v) => v.lang.startsWith("en")) ??
-      voices[0];
-    if (preferred) utt.voice = preferred;
-
-    utt.onstart  = () => setState("speaking");
-    utt.onpause  = () => setState("paused");
-    utt.onresume = () => setState("speaking");
-    utt.onend    = () => { uttRef.current = null; setState("done"); };
-    utt.onerror  = (e) => {
-      if (e.error === "interrupted" || e.error === "canceled") return;
-      uttRef.current = null;
-      setState("idle");
-    };
-
-    uttRef.current = utt;
-    setState("speaking"); // optimistic — onstart will confirm
-    window.speechSynthesis.speak(utt);
-  }, [state, content]);
+      audio.play();
+    } catch { setState("error"); }
+  }, [state, content, path, cleanup, startExprCycle, stopExprCycle]);
 
   const handlePause = useCallback(() => {
-    window.speechSynthesis.pause();
+    audioRef.current?.pause();
+    stopExprCycle();
     setState("paused");
-  }, []);
+  }, [stopExprCycle]);
 
-  if (state === "unsupported") return null;
+  const handleStop = useCallback(() => {
+    cleanup();
+    setState("idle");
+  }, [cleanup]);
 
-  const mascotSrc =
-    state === "speaking" ? mascot.speaking :
-    state === "paused"   ? mascot.paused   :
-    state === "done"     ? mascot.done     :
-    mascot.idle;
+  // ── Expression image ──────────────────────────────────────────────────────
+  const expression =
+    state === "speaking"
+      ? seq[exprIdx]
+      : stateEx[state] ?? "neutral";
 
-  const label =
-    state === "speaking" ? "Narrating…"        :
+  const mascotSrc = `/images/mascots/${prefix}_${expression}.png`;
+  const floatVisible = state !== "idle" && state !== "error";
+
+  const floatLabel =
+    state === "loading"  ? "Generating audio…" :
+    state === "speaking" ? "Narrating…"         :
     state === "paused"   ? "Paused"             :
-    state === "done"     ? "Done — play again?" :
-    "Listen to this module";
+    state === "done"     ? "Done!"              : "";
 
   return (
-    <div
-      className="flex items-center gap-4 rounded-xl px-4 py-3 mb-8"
-      style={{ background: accentDim, border: `1px solid ${border}` }}
-    >
-      <div className="relative flex-shrink-0">
-        <img
-          src={mascotSrc}
-          alt="Narrator mascot"
-          className="w-14 h-14 object-contain select-none"
-          style={state === "speaking"
-            ? { animation: "mascot-bob 0.6s ease-in-out infinite alternate" }
-            : undefined}
-        />
-        {state === "speaking" && (
-          <span
-            className="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-ping"
-            style={{ background: accent, opacity: 0.75 }}
-          />
-        )}
-      </div>
-
-      <span className="text-xs font-mono flex-1 truncate" style={{ color: accent }}>
-        {label}
-      </span>
-
-      <div className="flex items-center gap-2 flex-shrink-0">
-        {state !== "speaking" ? (
-          <button
-            onClick={handlePlay}
-            title={state === "paused" ? "Resume" : "Play"}
-            className="w-8 h-8 rounded-lg flex items-center justify-center transition-opacity hover:opacity-80"
-            style={{ background: accent }}
-          >
-            <Play className="w-4 h-4" style={{ color: "#0b0d16" }} />
-          </button>
-        ) : (
-          <button
-            onClick={handlePause}
-            title="Pause"
-            className="w-8 h-8 rounded-lg flex items-center justify-center transition-opacity hover:opacity-80"
-            style={{ background: accent }}
-          >
-            <Pause className="w-4 h-4" style={{ color: "#0b0d16" }} />
-          </button>
-        )}
-
-        {(state === "speaking" || state === "paused") && (
-          <button
-            onClick={stop}
-            title="Stop"
-            className="w-8 h-8 rounded-lg flex items-center justify-center border transition-colors hover:border-foreground/40"
-            style={{ borderColor: border }}
-          >
-            <Square className="w-3.5 h-3.5" style={{ color: accent }} />
-          </button>
-        )}
-      </div>
-
-      <style>{`
-        @keyframes mascot-bob {
-          from { transform: translateY(0px); }
-          to   { transform: translateY(-5px); }
+    <>
+      {/* ── Inline trigger ────────────────────────────────────────────── */}
+      <button
+        onClick={
+          state === "idle" || state === "error" || state === "done" ? handlePlay :
+          state === "speaking" ? handlePause : handlePlay
         }
-      `}</style>
-    </div>
+        disabled={state === "loading"}
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono transition-all hover:opacity-80 disabled:opacity-40 mb-8"
+        style={{ background: accentDim, border: `1px solid ${border}`, color: state === "error" ? "#ef4444" : accent }}
+      >
+        {state === "loading"
+          ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          : <Volume2 className="w-3.5 h-3.5" />}
+        {state === "idle"     ? "Listen to module"  :
+         state === "loading"  ? "Generating…"       :
+         state === "speaking" ? "Pause narration"   :
+         state === "paused"   ? "Resume narration"  :
+         state === "done"     ? "Play again"        :
+         "TTS unavailable"}
+      </button>
+
+      {/* ── Floating Clippy mascot ─────────────────────────────────────── */}
+      <AnimatePresence>
+        {floatVisible && (
+          <motion.div
+            key="clippy"
+            initial={{ opacity: 0, y: 40, scale: 0.85 }}
+            animate={{ opacity: 1, y: 0,  scale: 1 }}
+            exit={{   opacity: 0, y: 40, scale: 0.85 }}
+            transition={{ type: "spring", stiffness: 260, damping: 22 }}
+            className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2"
+          >
+            {/* Speech bubble with controls */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono shadow-lg"
+              style={{ background: "#0e1220", border: `1px solid ${border}`, color: accent }}
+            >
+              {state === "speaking" ? (
+                <button
+                  onClick={handlePause}
+                  className="w-6 h-6 rounded flex items-center justify-center hover:opacity-70"
+                  style={{ background: accent }} title="Pause"
+                >
+                  <Pause className="w-3 h-3" style={{ color: "#0b0d16" }} />
+                </button>
+              ) : state !== "loading" ? (
+                <button
+                  onClick={handlePlay}
+                  className="w-6 h-6 rounded flex items-center justify-center hover:opacity-70"
+                  style={{ background: accent }} title="Play"
+                >
+                  <Play className="w-3 h-3" style={{ color: "#0b0d16" }} />
+                </button>
+              ) : (
+                <Loader2 className="w-4 h-4 animate-spin" style={{ color: accent }} />
+              )}
+
+              <span>{floatLabel}</span>
+
+              {(state === "speaking" || state === "paused") && (
+                <button
+                  onClick={handleStop}
+                  className="w-6 h-6 rounded flex items-center justify-center border hover:border-foreground/40"
+                  style={{ borderColor: border }} title="Stop"
+                >
+                  <Square className="w-3 h-3" style={{ color: accent }} />
+                </button>
+              )}
+            </motion.div>
+
+            {/* Mascot — expression changes while speaking */}
+            <div className="relative">
+              <motion.img
+                key={mascotSrc}
+                src={mascotSrc}
+                alt="Narrator mascot"
+                className="w-44 h-44 object-contain select-none drop-shadow-2xl"
+                initial={{ opacity: 0.6, scale: 0.95 }}
+                animate={{ opacity: 1,   scale: 1,
+                  y: state === "speaking" ? [0, -8, 0] : 0 }}
+                transition={state === "speaking"
+                  ? { y: { duration: 0.9, repeat: Infinity, ease: "easeInOut" },
+                      opacity: { duration: 0.2 }, scale: { duration: 0.2 } }
+                  : { duration: 0.25 }}
+              />
+              {/* Glow under mascot while speaking */}
+              {state === "speaking" && (
+                <span
+                  className="absolute bottom-1 left-1/2 -translate-x-1/2 w-20 h-5 rounded-full blur-xl opacity-30 animate-pulse"
+                  style={{ background: accent }}
+                />
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

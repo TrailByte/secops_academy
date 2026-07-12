@@ -14,8 +14,11 @@ export function stripMarkdownForSpeech(md: string): string {
   t = t.replace(/^(\s*)[-*+]\s+/gm, "$1");
   t = t.replace(/^(\s*)\d+\.\s+/gm, "$1");
   t = t.replace(/^-{3,}\s*$/gm, "");
-  t = t.replace(/^\|[-| :]+\|$/gm, "");
-  t = t.replace(/\|/g, " ");
+  t = t.replace(/^\|(.+)\|$/gm, (_, inner) => {
+    if (/^[-| :]+$/.test(inner.trim())) return ""; // separator row
+    const cells = inner.split("|").map((c: string) => c.trim()).filter(Boolean);
+    return cells.join(", ") + ".";
+  });
   t = t.replace(/\n{2,}/g, ". ").replace(/\n/g, " ").replace(/\s{2,}/g, " ").replace(/\.\s*\./g, ".");
   return t.trim();
 }

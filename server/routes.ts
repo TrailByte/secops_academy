@@ -7,6 +7,7 @@ import passport from "passport";
 import { hashPassword, requireAuth, requireAdmin } from "./auth";
 import { uploadChallengeFile, deleteChallengeFileIfExists } from "./upload";
 import fs from "fs";
+import { synthesizeSpeech } from "./tts";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -59,6 +60,23 @@ export async function registerRoutes(
       res.json({ id: u.id, email: u.email, isAdmin: u.isAdmin });
     } else {
       res.json(null);
+    }
+  });
+
+  app.post("/api/tts", requireAuth, async (req, res) => {
+    const { text, learningPathSlug } = req.body;
+    if (!text || typeof text !== "string" || text.trim().length === 0) {
+      return res.status(400).json({ message: "text is required" });
+    }
+    const trimmed = text.slice(0, 12000);
+    try {
+      const audio = await synthesizeSpeech(trimmed, learningPathSlug ?? null);
+      res.set("Content-Type", "audio/wav");
+      res.set("Content-Length", String(audio.length));
+      res.send(audio);
+    } catch (err: any) {
+      console.error("TTS error:", err.message);
+      res.status(500).json({ message: "TTS generation failed" });
     }
   });
 
