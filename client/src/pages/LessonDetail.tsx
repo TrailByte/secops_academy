@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { playCompletionSound } from "@/lib/sounds";
+import MascotNarrator from "@/components/MascotNarrator";
 
 const difficultyConfig: Record<string, { className: string }> = {
   Beginner:     { className: "bg-green-500/10 text-green-400 border-green-500/20" },
@@ -163,6 +164,17 @@ export default function LessonDetail() {
           </h1>
           {/* Accent underline in path color */}
           <div className="h-1 w-20 rounded-full" style={{ background: theme.accent }} />
+        </div>
+
+        {/* Mascot Narrator */}
+        <div className="mt-6">
+          <MascotNarrator
+            content={lesson.content}
+            learningPathSlug={lesson.learningPathSlug}
+            accent={theme.accent}
+            accentDim={theme.accentDim}
+            border={theme.border}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
