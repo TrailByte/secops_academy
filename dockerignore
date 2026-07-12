@@ -1,0 +1,19 @@
+node_modules
+dist
+.git
+.github
+.env
+*.local
+
+# Dev files
+*.log
+.DS_Store
+
+# Piper voices (mounted as volume at runtime)
+piper-voices/
+
+# Test/dev uploads (real uploads come from the volume)
+client/public/files/
+
+# No need to copy these into the image
+.github/screenshots/

@@ -1,0 +1,44 @@
+# Production compose — for distribution to supervisor/examiner
+# Requires only Docker. No source code, no piper voices, no extra setup.
+#
+# Usage:
+#   1. Copy this file + .env.example to any machine with Docker
+#   2. Fill in .env (SESSION_SECRET + ADMIN_EMAIL)
+#   3. docker compose -f docker-compose.prod.yml up -d
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: secops
+      POSTGRES_PASSWORD: secops
+      POSTGRES_DB: secops
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U secops -d secops"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: trailbyte/secops-academy:latest
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://secops:secops@db:5432/secops
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      PIPER_VOICES_DIR: /voices
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+    volumes:
+      - uploads_data:/app/client/public/files/challenges
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  uploads_data:

@@ -13,7 +13,7 @@ import { db } from "../server/db";
 import { learningPaths, lessons, quizzes, challenges, quizAnswers } from "../shared/schema";
 import { eq, inArray } from "drizzle-orm";
 
-const LP_SLUG = "android-security-model";
+const LP_SLUG = "android-security";
 
 const LESSON_SLUGS = [
   "android-security-defense-in-depth",
@@ -51,18 +51,9 @@ async function seed() {
   // ── Learning Path ──────────────────────────────────────────────────────────
   const existingLp = await db.select().from(learningPaths).where(eq(learningPaths.slug, LP_SLUG));
   if (existingLp.length === 0) {
-    await db.insert(learningPaths).values({
-      slug: LP_SLUG,
-      title: "Android Security Model",
-      description: "Study how Android isolates applications and protects system resources through Linux UIDs, per-app sandboxes, permissions, secure IPC, SELinux, encrypted storage, Android Keystore, app signing, and Verified Boot.",
-      icon: "Smartphone",
-      color: "green",
-      order: 2,
-    });
-    console.log("  Creating learning path...");
-  } else {
-    console.log("  Learning path already exists, skipping.");
+    throw new Error(`Learning path "${LP_SLUG}" not found. Run seed-learning-paths.ts first.`);
   }
+  console.log("  Learning path found, skipping creation.");
 
   // Lesson 01
   const [l1] = await db.insert(lessons).values({
