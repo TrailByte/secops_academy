@@ -34,7 +34,7 @@ SecOps Academy is a modern web application designed to provide training for secu
 
 <div align="center">
 
-### Dashboard Overview
+### Introduction
 <img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/introduction.png" alt="Intorudction" width="800"/>
 
 *Introductory Page*
@@ -44,7 +44,7 @@ SecOps Academy is a modern web application designed to provide training for secu
 
 *Curriculum from beginner to advanced users*
 
-### Gamification System
+### User Dashboard
 <img src="https://raw.githubusercontent.com/TrailByte/secops_academy/main/.github/screenshots/dashboard.png" alt="Dashboard" width="800"/>
 
 *Track your progress with real-time statistics and quick access to training modules*
