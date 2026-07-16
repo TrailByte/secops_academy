@@ -1,4 +1,4 @@
-# ── Stage 1: Build ─────────────────────────────────────────────────────────────
+# Stage 1: Build
 FROM node:20-slim AS builder
 
 WORKDIR /app
@@ -6,9 +6,11 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npm run build
+# connect-pg-simple resolves table.sql relative to __dirname which after bundling is dist/
+RUN cp node_modules/connect-pg-simple/table.sql dist/table.sql
 
 
-# ── Stage 2: Production ────────────────────────────────────────────────────────
+# Stage 2: Production
 FROM node:20-slim AS production
 
 # Python + pip for Piper TTS + wget for voice download
@@ -34,12 +36,9 @@ ENV PIPER_VOICES_DIR=/voices
 
 WORKDIR /app
 
-# Production node_modules
+# Install all deps (drizzle-kit + tsx are devDeps but needed at runtime for migrations/seeds)
 COPY package*.json ./
-RUN npm ci --omit=dev
-
-# Runtime deps: tsx + drizzle-kit for entrypoint seed/migration
-RUN npm install -g tsx drizzle-kit
+RUN npm ci
 
 # Copy built app + runtime files
 COPY --from=builder /app/dist            ./dist
