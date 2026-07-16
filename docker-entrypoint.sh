@@ -2,7 +2,7 @@
 set -e
 
 echo "╔══════════════════════════════════════╗"
-echo "║       SecOps Academy — Startup       ║"
+echo "║       SecOps Academy - Startup       ║"
 echo "╚══════════════════════════════════════╝"
 
 # ── Wait for PostgreSQL ────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ pool.query(
   [process.env.ADMIN_EMAIL]
 ).then(r => {
   if (r.rowCount > 0) console.log('   Admin promoted:', process.env.ADMIN_EMAIL);
-  else console.log('  · Admin user not found yet — register first, then restart.');
+  else console.log('  · Admin user not found yet - register first, then restart.');
   pool.end();
   process.exit(0);
 }).catch(e => { console.error(e.message); pool.end(); process.exit(0); });
