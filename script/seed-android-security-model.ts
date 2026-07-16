@@ -63,7 +63,7 @@ async function seed() {
     order: 1,
     category: "foundations",
     difficulty: "Beginner",
-    learningPathSlug: "android-security-model",
+    learningPathSlug: "android-security",
   }).returning();
   await db.insert(quizzes).values({
     lessonId: l1.id,
@@ -89,7 +89,7 @@ async function seed() {
     order: 2,
     category: "sandbox",
     difficulty: "Beginner",
-    learningPathSlug: "android-security-model",
+    learningPathSlug: "android-security",
   }).returning();
   await db.insert(quizzes).values({
     lessonId: l2.id,
@@ -115,7 +115,7 @@ async function seed() {
     order: 3,
     category: "permissions",
     difficulty: "Beginner",
-    learningPathSlug: "android-security-model",
+    learningPathSlug: "android-security",
   }).returning();
   await db.insert(quizzes).values({
     lessonId: l3.id,
@@ -141,7 +141,7 @@ async function seed() {
     order: 4,
     category: "ipc",
     difficulty: "Intermediate",
-    learningPathSlug: "android-security-model",
+    learningPathSlug: "android-security",
   }).returning();
   await db.insert(quizzes).values({
     lessonId: l4.id,
@@ -167,7 +167,7 @@ async function seed() {
     order: 5,
     category: "data-protection",
     difficulty: "Intermediate",
-    learningPathSlug: "android-security-model",
+    learningPathSlug: "android-security",
   }).returning();
   await db.insert(quizzes).values({
     lessonId: l5.id,
@@ -193,7 +193,7 @@ async function seed() {
     order: 6,
     category: "system-security",
     difficulty: "Intermediate",
-    learningPathSlug: "android-security-model",
+    learningPathSlug: "android-security",
   }).returning();
   await db.insert(quizzes).values({
     lessonId: l6.id,
@@ -219,7 +219,7 @@ async function seed() {
     order: 7,
     category: "integrity",
     difficulty: "Intermediate",
-    learningPathSlug: "android-security-model",
+    learningPathSlug: "android-security",
   }).returning();
   await db.insert(quizzes).values({
     lessonId: l7.id,

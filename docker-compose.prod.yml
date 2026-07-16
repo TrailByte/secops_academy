@@ -1,11 +1,4 @@
-# Production compose — for distribution to supervisor/examiner
-# Requires only Docker. No source code, no piper voices, no extra setup.
-#
-# Usage:
-#   1. Copy this file + .env.example to any machine with Docker
-#   2. Fill in .env (SESSION_SECRET + ADMIN_EMAIL)
-#   3. docker compose -f docker-compose.prod.yml up -d
-
+name: secops-academy
 services:
   db:
     image: postgres:16-alpine
